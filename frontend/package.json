@@ -1,0 +1,36 @@
+{
+	"name": "cppkies-mod-repository-frontend",
+	"private": true,
+	"version": "0.0.0",
+	"description": "",
+	"main": "",
+	"scripts": {
+		"build:prod": "env NODE_ENV=production npm run build",
+		"build:dev": "env NODE_ENV=development npm run build",
+		"build": "npx webpack",
+		"eslint": "npx eslint ./src/*.jsx ./src/**/*.jsx ./src/**/*.js *.js",
+		"watch": "env NODE_ENV=development npx webpack-dev-server",
+		"eslint:fix": "npm run eslint -- --fix"
+	},
+	"author": "G lander",
+	"license": "ISC",
+	"dependencies": {},
+	"devDependencies": {
+		"@types/react": "^16.9.37",
+		"@types/react-dom": "^16.9.8",
+		"@types/styled-components": "^5.1.7",
+		"@typescript-eslint/eslint-plugin": "^4.11.0",
+		"@typescript-eslint/parser": "^4.11.0",
+		"eslint": "^7.16.0",
+		"eslint-plugin-react": "^7.21.5",
+		"html-webpack-plugin": "^3.2.0",
+		"react": "^16.12.0",
+		"react-dom": "^16.12.0",
+		"styled-components": "^5.2.1",
+		"ts-loader": "^7.0.5",
+		"typescript": "^3.9.5",
+		"webpack": "^4.41.5",
+		"webpack-cli": "^3.3.12",
+		"webpack-dev-server": "^3.11.0"
+	}
+}
