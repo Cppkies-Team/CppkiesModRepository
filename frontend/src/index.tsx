@@ -9,6 +9,7 @@ const Style = createGlobalStyle`
 		font-family: Tahoma, Arial, sans-serif;
 		background: url(//orteil.dashnet.org/cookieclicker/img/darkNoise.jpg) black;
 		min-height: 100vh;
+		overflow-x: hidden;
 	}
 `
 render(

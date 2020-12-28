@@ -1,0 +1,29 @@
+import styled from "styled-components"
+
+const Quote = styled.span`
+	display: block;
+	position: relative;
+	text-align: right;
+	margin-top: 8px;
+	font-style: italic;
+	color: rgba(255, 255, 255, 0.5);
+	font-size: 11.5px;
+	font-family: Georgia;
+	line-height: 135%;
+	&:before,
+	&:after {
+		display: inline-block;
+		font-size: 14px;
+		font-family: Georgia;
+		font-weight: bold;
+	}
+	&:before {
+		content: "“";
+	}
+	&:after {
+		content: "”";
+		margin-top: -2px;
+	}
+`
+
+export default Quote

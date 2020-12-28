@@ -12,3 +12,9 @@ const Frame = styled.div`
 `
 
 export default Frame
+
+export const VerticalFrame = styled(Frame)`
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+`

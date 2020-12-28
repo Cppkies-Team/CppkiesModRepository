@@ -1,5 +1,5 @@
 import styled from "styled-components"
-import { Icon as CCIcon } from "../types"
+import { CCIcon as CCIcon } from "../types"
 import React from "react"
 import { hasOwnProperty } from "../helpers"
 
