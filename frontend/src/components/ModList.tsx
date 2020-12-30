@@ -18,13 +18,13 @@ interface ModRowProps {
 const ModList: React.FC<ModRowProps> = props => {
 	return (
 		<BaseRow>
-			{props.mods.map(mod => (
+			{props.mods.map((mod, i) => (
 				<ModCard
 					name={mod.name}
 					desc={mod.desc}
 					icon={mod.icon}
 					version={mod.version}
-					key={mod.id}
+					key={i}
 				/>
 			))}
 		</BaseRow>

@@ -30,6 +30,7 @@ const FancyName = styled.span`
 			no-repeat;
 		right: -39px;
 	}
+	user-select: none;
 `
 
 export default FancyName

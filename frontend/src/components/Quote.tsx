@@ -24,6 +24,7 @@ const Quote = styled.span`
 		content: "”";
 		margin-top: -2px;
 	}
+	user-select: none;
 `
 
 export default Quote

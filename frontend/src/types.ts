@@ -4,6 +4,5 @@ export interface Mod {
 	name: string
 	desc?: string
 	icon?: CCIcon
-	id: number
 	version: string
 }
