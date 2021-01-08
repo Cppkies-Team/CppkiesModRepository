@@ -21,7 +21,7 @@ const ModList: React.FC<ModRowProps> = props => {
 			{props.mods.map((mod, i) => (
 				<ModCard
 					name={mod.name}
-					desc={mod.desc}
+					desc={mod.description}
 					icon={mod.icon}
 					version={mod.version}
 					key={i}

@@ -7,5 +7,8 @@ export const routes = [
 		method: "GET",
 		url: "/api/mods/",
 	}),
-	//{ method: "POST", url: "/api/mods/submit", handler: modController.addMod },
+	completeControllerEndpoint(modController.addMod, {
+		method: "POST",
+		url: "/api/mods/submit",
+	}),
 ]

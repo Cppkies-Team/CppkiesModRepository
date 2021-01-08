@@ -6,4 +6,8 @@ export const routes = [
 		method: "GET",
 		url: "/api/login/",
 	}),
+	completeControllerEndpoint(modController.refreshLogin, {
+		method: "POST",
+		url: "/api/login/refresh/",
+	}),
 ]

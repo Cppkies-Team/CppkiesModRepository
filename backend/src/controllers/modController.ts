@@ -1,34 +1,64 @@
 import boom from "@hapi/boom"
 import db from "../db"
-import { UnexpectedTypeError } from "../errors"
 import ControllerEndpoint from "../controllerHelper"
+import {
+	DBMod,
+	Mod,
+	ModSchema,
+	DBModToMod,
+	ModToDBMod,
+	UploadModSchema,
+	UploadMod,
+} from "../schemas/mods"
+import { toDatabaseTimestamp } from "../helpers"
+import {
+	AuthenticationHeaderSchema,
+	AuthenticationHeaderSchemaInterface,
+} from "../schemas/auth"
+import { getUser, validateToken } from "./authController"
+import { DBAuth } from "../schemas/auth"
 
-export interface DBMod {
-	id: string
-	name: string
-	description: string
-	uploaded: number
-	etc: Record<string, never>
-}
+const modDB = () => db.table<DBMod>("mods")
 
-const modDB = db.table<DBMod>("mods")
-
-export const getMods = new ControllerEndpoint<{ Reply: DBMod[] }>(
+export const getMods = new ControllerEndpoint<{ Reply: { mods: Mod[] } }>(
 	async () => {
 		try {
-			return await modDB.select()
+			return {
+				mods: (await modDB().select()).map(val => DBModToMod(val)),
+			}
 		} catch (err) {
 			throw boom.boomify(err)
 		}
-	},
-	{ response: {} } // TODO: getMods schema
+	}
 )
 
-export const addMod = new ControllerEndpoint(async (req, res) => {
-	if (typeof req.body !== "object" || req.body === null) {
-		res.code(400)
-		throw new UnexpectedTypeError(req.body, "object")
-	}
-	console.log(req.body)
-	return req.body
-})
+export const addMod = new ControllerEndpoint<{
+	Body: UploadMod
+	Headers: AuthenticationHeaderSchemaInterface
+}>(
+	async (req, res) => {
+		try {
+			if (!(await validateToken(req.headers.authentication))) {
+				res.code(400)
+				throw boom.unauthorized("Invalid token")
+			}
+			const author = (await getUser(req.headers.authentication)) as DBAuth // Trust me
+			let DBMod: DBMod = ModToDBMod({
+				...req.body,
+				uploaded: Date.now(),
+				authorId: author.discord_id,
+			})
+			if ((await modDB().where("keyname", DBMod.keyname)).length !== 0) {
+				res.code(400)
+				throw boom.badRequest("Duplicate mod keyname")
+			}
+			await modDB().insert(DBMod)
+		} catch (err) {
+			if (err instanceof boom.Boom) throw err
+			else throw boom.boomify(err)
+		}
+		res.code(200)
+		res.send("")
+	},
+	{ body: UploadModSchema, headers: AuthenticationHeaderSchema }
+)

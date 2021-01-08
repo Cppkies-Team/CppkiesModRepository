@@ -8,6 +8,7 @@ export default {
 		connection: {
 			filename: "./dev.sqlite",
 		},
+		useNullAsDefault: true,
 		migrations: {
 			loadExtensions: [".ts", ".js"],
 			extension: "ts",
