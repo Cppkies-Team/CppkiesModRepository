@@ -6,6 +6,7 @@ import FancyName from "./FancyName"
 import styled from "styled-components"
 import Tooltip from "./Tooltip"
 import Frame from "./Frame"
+import Button from "./Button"
 
 interface ModCardProps {
 	name: string
@@ -32,7 +33,7 @@ const ModCard: React.FC<ModCardProps> = props => {
 		<Tooltip popup={props.desc}>
 			<Frame
 				onClick={() => setInDetails(!inDetails)}
-				style={{ cursor: "pointer" }}
+				style={{ cursor: "pointer", position: "relative" }}
 			>
 				<VerticalList style={{ visibility: inDetails ? "hidden" : "unset" }}>
 					<FancyName>{props.name}</FancyName>
@@ -43,6 +44,26 @@ const ModCard: React.FC<ModCardProps> = props => {
 					)}
 					{props.icon ? <Icon icon={props.icon} /> : ""}
 					{props.desc ? <Quote>{props.desc}</Quote> : ""}
+				</VerticalList>
+				<VerticalList
+					style={{
+						visibility: !inDetails ? "hidden" : "unset",
+						position: "absolute",
+						top: 0,
+						right: 0,
+						width: "100%",
+						height: "100%",
+						justifyContent: "center",
+					}}
+				>
+					<Button
+						onClick={event => {
+							event.stopPropagation()
+						}}
+						type="good"
+					>
+						Subscribe
+					</Button>
 				</VerticalList>
 			</Frame>
 		</Tooltip>

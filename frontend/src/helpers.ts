@@ -9,3 +9,13 @@ export function hasOwnProperty<O extends object, K extends PropertyKey>(
 	// eslint-disable-next-line no-prototype-builtins
 	return obj.hasOwnProperty(key)
 }
+
+export type CoolReturnType<
+	T extends
+		| ((...args: unknown[]) => unknown)
+		| (new (...args: unknown[]) => unknown)
+> = T extends
+	| ((...args: unknown[]) => infer R)
+	| (new (...args: unknown[]) => infer R)
+	? R
+	: never

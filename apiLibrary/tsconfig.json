@@ -2,6 +2,8 @@
 	"compilerOptions": {
 		"sourceMap": true,
 		"strictNullChecks": true,
-		"esModuleInterop": true
+		"esModuleInterop": true,
+		"declaration": true,
+		"resolveJsonModule": true
 	}
 }

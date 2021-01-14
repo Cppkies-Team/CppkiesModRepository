@@ -25,6 +25,7 @@ const Tooltip: React.FC<TooltipProps> = props => {
 				ref={setReferenceElement}
 				onMouseOver={() => setHovered(true)}
 				onMouseOut={() => setHovered(false)}
+				className="tooltipBase"
 			>
 				{props.children}
 			</div>

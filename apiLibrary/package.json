@@ -5,14 +5,15 @@
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"build": "npx rollup -c",
-		"watch": "npm run build -- --watch"
+		"prodBuild": "echo '{\"prod\":true}' > prod.json && npm run build",
+		"watch": "echo '{\"prod\":false}' > prod.json && npm run build -- --watch"
 	},
 	"main": "./dist/index.js",
 	"keywords": [
 		"cppkies"
 	],
 	"author": "Cppkies Team",
-	"license": "ISC",
+	"license": "MIT",
 	"devDependencies": {
 		"@rollup/plugin-commonjs": "^11.0.2",
 		"@rollup/plugin-json": "^4.1.0",

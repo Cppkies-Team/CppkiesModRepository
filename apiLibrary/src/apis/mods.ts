@@ -6,7 +6,7 @@ export default function mixinMods<T extends new (...args: any[]) => CCRepoAPI>(
 ) {
 	return class extendedClass extends ogClass {
 		async getMods(): Promise<Mod[]> {
-			return await (await this.callApi("GET", "mods/")).json() // I am too lazy to validate it, heh
+			return (await (await this.callApi("GET", "mods/")).json()).mods // I am too lazy to validate it, heh
 		}
 	}
 }

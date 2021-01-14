@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 export NODE_ENV=production
+cd apiLibrary
+npm i
+npm run prodBuild
+cd ..
 cd frontend
 npm i
 npm run build:prod

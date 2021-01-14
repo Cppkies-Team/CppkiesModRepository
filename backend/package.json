@@ -11,7 +11,7 @@
 		"eslint:fix": "npm run eslint -- --fix"
 	},
 	"author": "G lander",
-	"license": "ISC",
+	"license": "MIT",
 	"dependencies": {
 		"@hapi/boom": "^9.1.1",
 		"discord-oauth2": "^2.6.0",
