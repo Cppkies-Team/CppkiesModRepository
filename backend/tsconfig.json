@@ -10,5 +10,5 @@
 		"target": "ES6",
 		"module": "commonjs"
 	},
-	"include": ["src/index.ts"]
+	"include": ["src/**/*.ts"]
 }

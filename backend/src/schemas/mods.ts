@@ -19,10 +19,55 @@ export interface DBMod {
 	icon: string
 	author_discord_id: string
 	version: string
+	package_link: string
+	entrypoint: string
 	etc: string
 }
 
-export interface UploadMod {
+/**
+ * The package.json which will be uploaded to ccrepo
+ */
+export type UploadMod = {
+	name: string
+	main: string
+	description: string
+	version: string
+	author?: string
+	ccrepo?: {
+		icon?: CCIcon
+		entrypoint?: string
+		name?: string
+	}
+	// Y'know, the other properties, like json schema's additionalProperties
+	[name: string]: unknown
+}
+
+export const UploadModSchema: JSONSchema6 = {
+	type: "object",
+	properties: {
+		name: {
+			type: "string",
+		},
+		version: { type: "string" },
+		description: {
+			type: "string",
+		},
+		main: { type: "string" },
+		ccrepo: {
+			type: "object",
+			properties: {
+				icon: CCIconSchema,
+				entrypoint: { type: "string" },
+				name: { type: "string" },
+			},
+			additionalProperties: false,
+		},
+	},
+	required: ["name", "description", "version", "main"],
+	additionalProperties: true,
+}
+
+export interface Mod {
 	/**
 	 * The unique keyname of the mod, can consist of
 	 * A-Z a-z 0-9 - _ . ! ~ * ' ( )
@@ -44,9 +89,21 @@ export interface UploadMod {
 	 * The version of the mod, must be in semver
 	 */
 	version: string
+	/**
+	 * Timestamp of the mods creation
+	 */
+	uploaded: number
+	/**
+	 * Id of the mod's uploader
+	 */
+	authorId: string
+	/**
+	 * The link to the code of the mod
+	 */
+	entrypoint: string
 }
 
-export const UploadModSchema: JSONSchema6 = {
+export const ModSchema: JSONSchema6 = {
 	type: "object",
 	properties: {
 		keyname: {
@@ -60,30 +117,20 @@ export const UploadModSchema: JSONSchema6 = {
 		},
 		icon: CCIconSchema,
 		version: { type: "string" },
-	},
-	required: ["keyname", "name", "description", "version"],
-	additionalProperties: false,
-}
-
-export interface Mod extends UploadMod {
-	/**
-	 * Timestamp of the mods creation
-	 */
-	uploaded: number
-	/**
-	 * Id of the mod's uploader
-	 */
-	authorId: string
-}
-
-export const ModSchema: JSONSchema6 = {
-	...UploadModSchema,
-	properties: {
-		...UploadModSchema.properties,
 		uploaded: { type: "number" },
 		authorId: { type: "string" },
+		entrypoint: { type: "string" },
 	},
-	required: [...(UploadModSchema.required ?? []), "uploaded", "authorId"],
+	required: [
+		"keyname",
+		"name",
+		"description",
+		"version",
+		"uploaded",
+		"authorId",
+		"entrypoint",
+	],
+	additionalProperties: false,
 }
 
 /**
@@ -98,22 +145,7 @@ export function DBModToMod(dbMod: DBMod): Mod {
 		icon: JSON.parse(dbMod.icon),
 		version: dbMod.version,
 		authorId: dbMod.author_discord_id,
-	}
-}
-
-/**
- * Converts a mod instance to a database mod record
- */
-export function ModToDBMod(mod: Mod): DBMod {
-	return {
-		keyname: mod.keyname,
-		name: mod.name,
-		description: mod.description,
-		uploaded: toDatabaseTimestamp(new Date(mod.uploaded ?? Date.now())),
-		author_discord_id: mod.authorId,
-		icon: JSON.stringify(mod.icon),
-		version: mod.version,
-		etc: "{}",
+		entrypoint: dbMod.entrypoint,
 	}
 }
 
@@ -133,4 +165,14 @@ export const QueryModSchema: JSONSchema6 = {
 		},
 	},
 	additionalProperties: false,
+}
+
+export interface UploadModControllerSchemaInterface {
+	link: string
+}
+
+export const UploadModControllerSchema: JSONSchema6 = {
+	type: "object",
+	properties: { link: { type: "string" } },
+	required: ["link"],
 }

@@ -11,6 +11,17 @@
 			"cwd": "${workspaceFolder}/backend",
 			"sourceMaps": true,
 			"preLaunchTask": "Backend build"
+		},
+		{
+			"type": "node",
+			"request": "launch",
+			"name": "Launch Backend Daily Routine",
+			"program": "${workspaceFolder}/backend/src/bumpMods.ts",
+			"skipFiles": ["<node_internals>/**"],
+			"outFiles": ["${workspaceFolder}/backend/dist/**/*"],
+			"cwd": "${workspaceFolder}/backend",
+			"sourceMaps": true,
+			"preLaunchTask": "Backend build"
 		}
 	]
 }

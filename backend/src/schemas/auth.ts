@@ -4,6 +4,8 @@ export interface DBAuth {
 	discord_refresh_token: string
 	discord_redirect_uri: string
 	discord_token_expire_date: string
+	admin: boolean
+	system: boolean
 }
 
 export interface AuthLoginQuerySchemaInterface {

@@ -20,20 +20,24 @@ const authDB = () => db.table<DBAuth>("discord_auth")
  * @param token The token to validate
  */
 export async function validateToken(token: string) {
-	if (!token) return false
+	return !!getUser(token)
+}
+
+export async function getUser(token: string): Promise<DBAuth | null> {
+	if (!token) return null
 	const records = await authDB().where({ discord_auth_token: token })
 	// If token doesn't exist
-	if (records.length === 0) return false
+	if (records.length === 0) return null
 	// If token expired
 	const expired =
 		Date.now() > new Date(records[0].discord_token_expire_date).getTime()
 	// If the token is expired, remove it (removed for now)
 	// if (expired) await authDB().where({ discord_auth_token: token }).del()
-	return !expired
+	return expired ? null : records[0]
 }
 
-export async function getUser(token: string): Promise<DBAuth | null> {
-	return (await authDB().where({ discord_auth_token: token }))[0] ?? null
+export async function getUserById(id: string): Promise<DBAuth | null> {
+	return (await authDB().select().where({ discord_id: id }))[0]
 }
 
 export const login = new ControllerEndpoint<{

@@ -24,6 +24,9 @@
 		"peacock.color": "#215732",
 		"prettier.tabWidth": 4,
 		"prettier.semi": false,
-		"prettier.useTabs": true
+		"prettier.useTabs": true,
+		"cSpell.words": [
+			"ccrepo"
+		]
 	}
 }

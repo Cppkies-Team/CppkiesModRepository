@@ -4,21 +4,26 @@ import ControllerEndpoint from "../controllerHelper"
 import {
 	DBMod,
 	Mod,
-	ModSchema,
 	DBModToMod,
-	ModToDBMod,
 	UploadModSchema,
 	UploadMod,
 } from "../schemas/mods"
-import { toDatabaseTimestamp } from "../helpers"
 import {
 	AuthenticationHeaderSchema,
 	AuthenticationHeaderSchemaInterface,
 } from "../schemas/auth"
-import { getUser, validateToken } from "./authController"
+import { getUser, getUserById } from "./authController"
 import { DBAuth } from "../schemas/auth"
+import { toDatabaseTimestamp } from "../helpers"
+import sa from "superagent"
+import ajv from "ajv"
+import {
+	UploadModControllerSchemaInterface,
+	UploadModControllerSchema,
+} from "../schemas/mods"
 
 const modDB = () => db.table<DBMod>("mods")
+const trustMe = <T>(thing: unknown): thing is T => true
 
 export const getMods = new ControllerEndpoint<{ Reply: { mods: Mod[] } }>(
 	async () => {
@@ -32,33 +37,101 @@ export const getMods = new ControllerEndpoint<{ Reply: { mods: Mod[] } }>(
 	}
 )
 
+const validator = ajv()
+
+export async function bumpMod(
+	link: string,
+	token: string | null,
+	keyname?: string
+): Promise<void> {
+	let res: any // Typescript never recasts it if it's `unknown`, *why*
+	try {
+		res = JSON.parse((await sa(link)).text)
+	} catch {
+		throw boom.badRequest("Could not fetch mod from server")
+	}
+	if (!trustMe<UploadMod>(res) || !validator.validate(UploadModSchema, res))
+		throw boom.badData(
+			`Invalid server response: ${validator.errorsText(validator.errors)}`
+		)
+
+	if (
+		(keyname && res.name !== keyname) ||
+		(!keyname && (await modDB().where({ keyname: res.name })).length !== 0)
+	)
+		if (keyname)
+			throw boom.badRequest(
+				"Invalid keyname, keyname must never change, you must delete the mod with the current keyname and create a mod with the new one."
+			)
+		else throw boom.badRequest("Mod with keyname already exists")
+
+	let author: DBAuth
+	// Get the bumper
+	const bumper = token ? await getUser(token) : null
+	if (!bumper && token) throw boom.unauthorized("Invalid token")
+	// Check if mod exists
+	const oldMod: DBMod | undefined = (
+		await modDB().where({ keyname: res.name })
+	)[0]
+	if (!oldMod) {
+		if (!bumper) throw boom.internal() // System submitted a mod
+		author = bumper
+	} else {
+		const ogAuthor = await getUserById(oldMod.author_discord_id)
+		if (!ogAuthor) throw boom.internal("Mod author doesn't exist!")
+		author = ogAuthor
+	}
+
+	const dbMod: DBMod = {
+		keyname: res.name,
+		name: res.ccrepo?.name ?? res.name,
+		version: res.version,
+		description: res.description,
+		entrypoint: res.ccrepo?.entrypoint ?? res.main,
+		uploaded: oldMod ? oldMod.uploaded : toDatabaseTimestamp(new Date()),
+		author_discord_id: author.discord_id,
+		icon: JSON.stringify(res.ccrepo?.icon || null),
+		package_link: link,
+		etc: "{}",
+	}
+
+	try {
+		await db.transaction(async ctx => {
+			try {
+				await modDB()
+					.transacting(ctx)
+					.where({ keyname: res.name })
+					.del()
+				await modDB().transacting(ctx).insert(dbMod)
+				await ctx.commit()
+			} catch (err) {
+				await ctx.rollback()
+				throw err
+			}
+		})
+	} catch (err) {
+		throw boom.internal("Internal database issue")
+	}
+}
+
 export const addMod = new ControllerEndpoint<{
-	Body: UploadMod
+	Body: UploadModControllerSchemaInterface
 	Headers: AuthenticationHeaderSchemaInterface
 }>(
 	async (req, res) => {
 		try {
-			if (!(await validateToken(req.headers.authentication))) {
-				res.code(400)
-				throw boom.unauthorized("Invalid token")
-			}
-			const author = (await getUser(req.headers.authentication)) as DBAuth // Trust me
-			let DBMod: DBMod = ModToDBMod({
-				...req.body,
-				uploaded: Date.now(),
-				authorId: author.discord_id,
-			})
-			if ((await modDB().where("keyname", DBMod.keyname)).length !== 0) {
-				res.code(400)
-				throw boom.badRequest("Duplicate mod keyname")
-			}
-			await modDB().insert(DBMod)
+			await bumpMod(req.body.link, req.headers.authentication)
 		} catch (err) {
-			if (err instanceof boom.Boom) throw err
-			else throw boom.boomify(err)
+			if (err instanceof boom.Boom) {
+				if (!err.isServer) res.code(400)
+				throw err
+			} else throw boom.boomify(err)
 		}
 		res.code(200)
 		res.send("")
 	},
-	{ body: UploadModSchema, headers: AuthenticationHeaderSchema }
+	{
+		body: UploadModControllerSchema,
+		headers: AuthenticationHeaderSchema,
+	}
 )

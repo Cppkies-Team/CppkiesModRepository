@@ -47,6 +47,7 @@ const ModCard: React.FC<ModCardProps> = props => {
 				</VerticalList>
 				<VerticalList
 					style={{
+						// Mm, CSS
 						visibility: !inDetails ? "hidden" : "unset",
 						position: "absolute",
 						top: 0,
@@ -58,7 +59,9 @@ const ModCard: React.FC<ModCardProps> = props => {
 				>
 					<Button
 						onClick={event => {
+							// Do not flip page
 							event.stopPropagation()
+							// TODO: Communicate with addon
 						}}
 						type="good"
 					>
