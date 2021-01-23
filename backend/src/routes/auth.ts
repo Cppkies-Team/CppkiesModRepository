@@ -3,7 +3,7 @@ import { completeControllerEndpoint } from "../controllerHelper"
 
 export const routes = [
 	completeControllerEndpoint(modController.login, {
-		method: "GET",
+		method: "POST",
 		url: "/api/login/",
 	}),
 	completeControllerEndpoint(modController.refreshLogin, {

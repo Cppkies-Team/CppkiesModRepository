@@ -8,18 +8,20 @@ export interface DBAuth {
 	system: boolean
 }
 
-export interface AuthLoginQuerySchemaInterface {
+export interface AuthLoginBodySchemaInterface {
 	code: string
+	redirectUrl: string
 }
 
-export const AuthLoginQuerySchema = {
+export const AuthLoginBodySchema = {
 	type: "object",
 	properties: {
 		code: {
 			type: "string",
 		},
+		redirectUrl: { type: "string" },
 	},
-	required: ["code"],
+	required: ["code", "redirectUrl"],
 	additionalProperties: false,
 }
 

@@ -4,6 +4,8 @@
 		"strictNullChecks": true,
 		"esModuleInterop": true,
 		"declaration": true,
-		"resolveJsonModule": true
+		"moduleResolution": "node",
+		"resolveJsonModule": true,
+		"target": "ES2015"
 	}
 }

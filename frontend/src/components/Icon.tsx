@@ -24,7 +24,7 @@ export default class Icon extends React.Component<IconProps1 | IconProps2> {
 		if (hasOwnProperty(this.props, "x"))
 			icon = [this.props.x, this.props.y, this.props.link]
 		else icon = this.props.icon
-
+		//this.props.
 		return (
 			<IconBase
 				style={{

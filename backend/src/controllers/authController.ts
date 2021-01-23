@@ -1,6 +1,6 @@
 import {
-	AuthLoginQuerySchema,
-	AuthLoginQuerySchemaInterface,
+	AuthLoginBodySchema,
+	AuthLoginBodySchemaInterface,
 	DBAuth,
 } from "../schemas/auth"
 import ControllerEndpoint from "../controllerHelper"
@@ -41,20 +41,13 @@ export async function getUserById(id: string): Promise<DBAuth | null> {
 }
 
 export const login = new ControllerEndpoint<{
-	Querystring: AuthLoginQuerySchemaInterface
+	Body: AuthLoginBodySchemaInterface
 }>(
 	async req => {
-		const thisUrl = new URL(
-			`${
-				process.env.NODE_ENV === "production" ? "https" : "http" // Workaround due to fastify reporting wrong protocol
-			}://${req.hostname}${req.url}`
-		)
-		const redirectUri = thisUrl.origin + thisUrl.pathname
-
 		try {
 			const discordReply = await oauth.tokenRequest({
-				redirectUri,
-				code: req.query.code,
+				redirectUri: req.body.redirectUrl,
+				code: req.body.code,
 				grantType: "authorization_code",
 				scope: "identify",
 			})
@@ -71,7 +64,7 @@ export const login = new ControllerEndpoint<{
 					discord_auth_token: discordReply.access_token,
 					discord_refresh_token: discordReply.refresh_token,
 					discord_id: user.id,
-					discord_redirect_uri: redirectUri,
+					discord_redirect_uri: req.body.redirectUrl,
 					discord_token_expire_date: toDatabaseTimestamp(
 						new Date(Date.now() + discordReply.expires_in * 1000)
 					),
@@ -84,7 +77,7 @@ export const login = new ControllerEndpoint<{
 			throw boom.boomify(err)
 		}
 	},
-	{ querystring: AuthLoginQuerySchema }
+	{ body: AuthLoginBodySchema }
 )
 
 export const refreshLogin = new ControllerEndpoint<{

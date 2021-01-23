@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState } from "react"
 import {
 	BrowserRouter as Router,
 	Switch,
@@ -10,6 +10,8 @@ import FancyName from "./FancyName"
 import { VerticalFrame } from "./Frame"
 import AllModsList from "./AllModsList"
 import { ApiContext, defaultApi } from "../contexts"
+import LoginRedirecter from "./LoginRedirecter"
+import TopBar from "./TopBar"
 
 export default class App extends React.Component {
 	render(): JSX.Element {
@@ -17,15 +19,16 @@ export default class App extends React.Component {
 			<ApiContext.Provider value={defaultApi}>
 				<Router>
 					<ShowerBackground />
-					<VerticalFrame style={{ marginTop: 0 }}>
-						<FancyName>Cppkies mod repository</FancyName>
-					</VerticalFrame>
+					<TopBar />
 					<Switch>
 						<Route path="/all">
 							<AllModsList />
 						</Route>
 						{/* TODO: Main page*/}
 						<Redirect exact from="/" to="/all" />
+						<Route path="/login/">
+							<LoginRedirecter />
+						</Route>
 						<Route path="*">
 							<VerticalFrame>
 								<FancyName>404!</FancyName>

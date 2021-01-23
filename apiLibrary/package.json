@@ -5,7 +5,7 @@
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"build": "npx rollup -c",
-		"prodBuild": "echo '{\"prod\":true}' > prod.json && npm run build",
+		"prodBuild": "rm dist -r && echo '{\"prod\":true}' > prod.json && npm run build && mv ./dist/src/* ./dist",
 		"watch": "echo '{\"prod\":false}' > prod.json && npm run build -- --watch"
 	},
 	"main": "./dist/index.js",

@@ -5,11 +5,11 @@
 	"description": "",
 	"main": "",
 	"scripts": {
-		"build:prod": "env NODE_ENV=production npm run build",
-		"build:dev": "env NODE_ENV=development npm run build",
+		"build:prod": "echo '{\"prod\":true}' > prod.json && env NODE_ENV=production npm run build",
+		"build:dev": "echo '{\"prod\":false}' > prod.json && env NODE_ENV=development npm run build",
 		"build": "npx webpack",
 		"eslint": "npx eslint ./src/*.jsx ./src/**/*.jsx ./src/**/*.js *.js",
-		"watch": "env NODE_ENV=development npx webpack-dev-server",
+		"watch": "echo '{\"prod\":false}' > prod.json && env NODE_ENV=development npx webpack-dev-server",
 		"eslint:fix": "npm run eslint -- --fix"
 	},
 	"author": "G lander",
