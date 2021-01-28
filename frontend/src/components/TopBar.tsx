@@ -3,6 +3,7 @@ import FancyName from "./FancyName"
 import Frame from "./Frame"
 import styled from "styled-components"
 import UserButton from "./UserButton"
+import UploadButton from "./UploadButton"
 
 const CoolFrame = styled(Frame)`
 	margin-top: 0;
@@ -16,8 +17,9 @@ const TopBar: React.FC = () => (
 			Cppkies mod repository
 		</FancyName>
 		<div style={{ marginLeft: "auto" }}>
-			<UserButton />
+			<UploadButton />
 		</div>
+		<UserButton />
 	</CoolFrame>
 )
 

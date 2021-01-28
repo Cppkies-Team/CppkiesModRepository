@@ -18,15 +18,20 @@ const UserButton: React.FC = () => {
 			{api => {
 				if (changeCounter === 0)
 					api.on("userChange", () => setChangeCounter(changeCounter + 1))
-
 				return (
 					<Tooltip
 						popup={
-							api.apiKey ? "Logged in, no user details yet" : "Click to log in"
+							api.user ? (
+								<div>Logged in as {api.user.tag}</div>
+							) : (
+								"Click to log in"
+							)
 						}
 					>
 						<SensibleLink to="login/">
-							<Icon icon={[12 + (api.apiKey ? 1 : 0), 6]} />
+							<Icon
+								icon={[12 + (api.user ? 1 : 0) + (api.user?.admin ? 1 : 0), 6]}
+							/>
 						</SensibleLink>
 					</Tooltip>
 				)

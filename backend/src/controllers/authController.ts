@@ -12,6 +12,14 @@ import {
 	RefreshLoginBodySchemaInterface,
 } from "../schemas/auth"
 import { toDatabaseTimestamp } from "../helpers"
+import {
+	AuthenticationHeaderSchemaInterface,
+	AuthenticationHeaderSchema,
+} from "../schemas/auth"
+import {
+	UserDetailsBodySchemaInterface,
+	UserDetailsBodySchema,
+} from "../schemas/auth"
 
 const authDB = () => db.table<DBAuth>("discord_auth")
 
@@ -120,5 +128,61 @@ export const refreshLogin = new ControllerEndpoint<{
 	},
 	{
 		body: RefreshLoginBodySchema,
+	}
+)
+
+export const getUserDetails = new ControllerEndpoint<{
+	Body: UserDetailsBodySchemaInterface
+}>(
+	async (req, res) => {
+		try {
+			const user = await getUserById(req.body.userId.toString())
+			if (!user) {
+				res.code(400)
+				throw boom.badRequest("Bad Request")
+			}
+
+			const discordUser = await oauth.getUser(user.discord_auth_token)
+
+			return {
+				id: user.discord_id,
+				tag: discordUser.username,
+				admin: user.admin,
+				system: user.system,
+			}
+		} catch (err) {
+			throw boom.boomify(err)
+		}
+	},
+	{
+		body: UserDetailsBodySchema,
+	}
+)
+
+export const getThisUserDetails = new ControllerEndpoint<{
+	Headers: AuthenticationHeaderSchemaInterface
+}>(
+	async (req, res) => {
+		try {
+			const user = await getUser(req.headers.authentication)
+			if (!user) {
+				res.code(400)
+				throw boom.badRequest("Bad Request")
+			}
+
+			const discordUser = await oauth.getUser(user.discord_auth_token)
+
+			return {
+				id: user.discord_id,
+				tag: discordUser.username,
+				admin: user.admin,
+				system: user.system,
+			}
+		} catch (err) {
+			throw boom.boomify(err)
+		}
+	},
+	{
+		headers: AuthenticationHeaderSchema,
 	}
 )

@@ -1,16 +1,20 @@
 import { prod } from "../prod.json"
+import { User } from "./index"
 
 type ApiEvents = "userChange"
 
 export default class CCRepoAPI {
 	_events = {} as Record<ApiEvents, (() => void)[] | undefined>
+	user?: User
 	apiLink = prod
 		? "https://ccrepo.glander.club/api"
 		: "http://localhost:9001/api"
 	redirectUrl = prod
 		? `${this.apiLink.substr(0, this.apiLink.length - 3)}login/`
 		: "http://localhost:5500/login/"
-	constructor(public apiKey?: string, public refreshToken?: string) {}
+	constructor(public apiKey?: string, public refreshToken?: string) {
+		if (apiKey) this.getSelfUser()
+	}
 	async callApi(
 		method: "GET" | "POST" | "DELETE",
 		link: string,
@@ -19,7 +23,7 @@ export default class CCRepoAPI {
 		const res = await fetch(`${this.apiLink}/${link}`, {
 			headers: {
 				Authentication: this.apiKey ?? "",
-				"Content-Type": "application/json",
+				...(body ? { "Content-Type": "application/json" } : {}),
 			},
 			method,
 			body: JSON.stringify(body),
@@ -41,7 +45,7 @@ export default class CCRepoAPI {
 		).json()
 		this.apiKey = res.token
 		this.refreshToken = res.refreshToken
-		this.emit("userChange")
+		await this.getSelfUser()
 	}
 	async updateToken(): Promise<void> {
 		const res = await (
@@ -51,7 +55,16 @@ export default class CCRepoAPI {
 		).json()
 		this.apiKey = res.token
 		this.refreshToken = res.refreshToken
+		await this.getSelfUser()
+	}
+	async getUser(id: number): Promise<User> {
+		return await (await this.callApi("POST", "getUser/", { id })).json()
+	}
+	async getSelfUser(): Promise<User> {
+		const ret = await (await this.callApi("POST", "getUser/self")).json()
+		this.user = ret
 		this.emit("userChange")
+		return ret
 	}
 	emit(eventName: ApiEvents): void {
 		if (!this._events[eventName]) this._events[eventName] = []

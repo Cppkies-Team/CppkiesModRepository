@@ -6,6 +6,8 @@ interface TooltipProps {
 	popup: React.ReactNode
 	placement?: Placement
 	flip?: boolean
+	keepOpen?: boolean | null
+	allowHoveringOnPopup?: boolean
 }
 
 const Tooltip: React.FC<TooltipProps> = props => {
@@ -13,18 +15,24 @@ const Tooltip: React.FC<TooltipProps> = props => {
 		null
 	)
 	const [popperElement, setPopperElement] = useState<HTMLElement | null>(null)
-	const [hovered, setHovered] = useState(false)
+	const [hovered, setHovered] = useState(props.keepOpen ?? false)
 	const { styles, attributes } = usePopper(referenceElement, popperElement, {
 		placement: props.placement ?? "right",
 		modifiers: [{ name: "flip", enabled: props.flip ?? true }],
 	})
 
+	function updateHoverState(newState: boolean, fromPopup?: boolean): void {
+		if (fromPopup) {
+			if (props.allowHoveringOnPopup) setHovered(newState)
+		} else if (typeof props.keepOpen !== "boolean") setHovered(newState)
+	}
+
 	return (
 		<>
 			<div
 				ref={setReferenceElement}
-				onMouseOver={() => setHovered(true)}
-				onMouseOut={() => setHovered(false)}
+				onMouseOver={() => updateHoverState(true)}
+				onMouseOut={() => updateHoverState(false)}
 				className="tooltipBase"
 			>
 				{props.children}
@@ -33,6 +41,8 @@ const Tooltip: React.FC<TooltipProps> = props => {
 				<Frame
 					ref={setPopperElement}
 					style={{ ...styles.popper, zIndex: 999, margin: 0 }}
+					onMouseOver={() => updateHoverState(true, true)}
+					onMouseOut={() => updateHoverState(false, true)}
 					{...attributes.popper}
 				>
 					{props.popup}

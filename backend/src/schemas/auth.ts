@@ -40,6 +40,21 @@ export const RefreshLoginBodySchema = {
 	additionalProperties: false,
 }
 
+export interface UserDetailsBodySchemaInterface {
+	userId: number
+}
+
+export const UserDetailsBodySchema = {
+	type: "object",
+	properties: {
+		userId: {
+			type: "number",
+		},
+	},
+	required: ["userId"],
+	additionalProperties: false,
+}
+
 export interface AuthenticationHeaderSchemaInterface {
 	authentication: string
 }

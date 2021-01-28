@@ -9,7 +9,7 @@ export default function mixinMods<T extends new (...args: any[]) => CCRepoAPI>(
 			return (await (await this.callApi("GET", "mods/")).json()).mods // I am too lazy to validate it, heh
 		}
 		async submitMod(link: string): Promise<void> {
-			await this.callApi("POST", "mods/upload", { link })
+			await this.callApi("POST", "mods/submit", { link })
 		}
 	}
 }
