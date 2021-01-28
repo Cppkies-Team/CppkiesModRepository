@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react"
 import { Redirect } from "react-router-dom"
-import { ApiContext, writeTokens, loginLink } from "../contexts"
+import { ApiContext, loginLink } from "../contexts"
 import { VerticalFrame } from "./Frame"
 import FancyName from "./FancyName"
 const LoginRedirecter: React.FC = () => {
@@ -22,7 +22,6 @@ const LoginRedirecter: React.FC = () => {
 						api
 							.createToken(token)
 							.then(() => {
-								writeTokens(api)
 								if (mounted) setIsDone(true)
 							})
 							.catch(err => {

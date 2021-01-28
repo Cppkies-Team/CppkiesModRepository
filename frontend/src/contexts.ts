@@ -44,4 +44,6 @@ export const defaultApi = new CCRepoAPI(tokens?.token, tokens?.refreshToken)
 if (defaultApi.refreshToken)
 	defaultApi.updateToken().catch(() => console.warn("Couldn't refresh tokens."))
 
+defaultApi.on("userChange", () => writeTokens(defaultApi))
+
 export const ApiContext = React.createContext(defaultApi)
