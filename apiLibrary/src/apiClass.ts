@@ -49,7 +49,7 @@ export default class CCRepoAPI {
 	}
 	async updateToken(): Promise<void> {
 		const res = await (
-			await this.callApi("GET", "login/refresh", {
+			await this.callApi("POST", "login/refresh/", {
 				refreshToken: this.refreshToken,
 			})
 		).json()
