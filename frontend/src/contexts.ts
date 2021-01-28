@@ -39,4 +39,9 @@ export const loginLink = `https://discord.com/oauth2/authorize?client_id=7941754
 }/login/&response_type=code&scope=identify`
 
 export const defaultApi = new CCRepoAPI(tokens?.token, tokens?.refreshToken)
+
+// For good measure
+if (defaultApi.refreshToken)
+	defaultApi.updateToken().catch(() => console.warn("Couldn't refresh tokens."))
+
 export const ApiContext = React.createContext(defaultApi)
