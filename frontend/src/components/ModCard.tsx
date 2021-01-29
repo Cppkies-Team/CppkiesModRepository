@@ -27,6 +27,10 @@ const VerticalList = styled.div`
 	align-items: center;
 `
 
+const WidthedQuote = styled(Quote)`
+	width: 30ch;
+`
+
 const ModCard: React.FC<ModCardProps> = props => {
 	const [inDetails, setInDetails] = useState(false)
 	return (
@@ -43,7 +47,7 @@ const ModCard: React.FC<ModCardProps> = props => {
 						""
 					)}
 					{props.icon ? <Icon icon={props.icon} /> : ""}
-					{props.desc ? <Quote>{props.desc}</Quote> : ""}
+					{props.desc ? <WidthedQuote>{props.desc}</WidthedQuote> : ""}
 				</VerticalList>
 				<VerticalList
 					style={{
