@@ -2,6 +2,9 @@ import React from "react"
 import CCRepoAPI from "../../apiLibrary/"
 import { CoolReturnType, hasOwnProperty } from "./helpers"
 import { prod } from "../prod.json"
+import CMMApi from "./cmm-api"
+
+//#region API context
 interface LocalStorageData {
 	token: string
 	refreshToken: string
@@ -47,3 +50,12 @@ if (defaultApi.refreshToken)
 defaultApi.on("userChange", () => writeTokens(defaultApi))
 
 export const ApiContext = React.createContext(defaultApi)
+
+//#endregion
+//#region CMM Context
+
+export const defaultCMMApi = new CMMApi()
+
+export const CMMContext = React.createContext(defaultCMMApi)
+
+//#endregion

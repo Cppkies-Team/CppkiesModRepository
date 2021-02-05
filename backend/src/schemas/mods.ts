@@ -101,6 +101,10 @@ export interface Mod {
 	 * The link to the code of the mod
 	 */
 	entrypoint: string
+	/**
+	 * Link to the package's package.json
+	 */
+	packageLink: string
 }
 
 export const ModSchema: JSONSchema6 = {
@@ -146,6 +150,7 @@ export function DBModToMod(dbMod: DBMod): Mod {
 		version: dbMod.version,
 		authorId: dbMod.author_discord_id,
 		entrypoint: dbMod.entrypoint,
+		packageLink: dbMod.package_link,
 	}
 }
 

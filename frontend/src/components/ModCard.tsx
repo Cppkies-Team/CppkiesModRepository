@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { CCIcon } from "../types"
+import { Mod } from "../types"
 import Icon from "./Icon"
 import Quote from "./Quote"
 import FancyName from "./FancyName"
@@ -7,12 +7,10 @@ import styled from "styled-components"
 import Tooltip from "./Tooltip"
 import Frame from "./Frame"
 import Button from "./Button"
+import { CMMContext } from "../contexts"
 
 interface ModCardProps {
-	name: string
-	icon?: CCIcon
-	desc?: string
-	version?: string
+	mod: Mod
 }
 
 const VersionDisplay = styled.span`
@@ -31,23 +29,23 @@ const WidthedQuote = styled(Quote)`
 	width: 30ch;
 `
 
-const ModCard: React.FC<ModCardProps> = props => {
+const ModCard: React.FC<ModCardProps> = ({ mod }) => {
 	const [inDetails, setInDetails] = useState(false)
 	return (
-		<Tooltip popup={props.desc}>
+		<div>
 			<Frame
 				onClick={() => setInDetails(!inDetails)}
 				style={{ cursor: "pointer", position: "relative" }}
 			>
 				<VerticalList style={{ visibility: inDetails ? "hidden" : "unset" }}>
-					<FancyName>{props.name}</FancyName>
-					{props.version ? (
-						<VersionDisplay>v{props.version}</VersionDisplay>
+					<FancyName>{mod.name}</FancyName>
+					{mod.version ? <VersionDisplay>v{mod.version}</VersionDisplay> : ""}
+					{mod.icon ? <Icon icon={mod.icon} /> : ""}
+					{mod.description ? (
+						<WidthedQuote>{mod.description}</WidthedQuote>
 					) : (
 						""
 					)}
-					{props.icon ? <Icon icon={props.icon} /> : ""}
-					{props.desc ? <WidthedQuote>{props.desc}</WidthedQuote> : ""}
 				</VerticalList>
 				<VerticalList
 					style={{
@@ -61,19 +59,27 @@ const ModCard: React.FC<ModCardProps> = props => {
 						justifyContent: "center",
 					}}
 				>
-					<Button
-						onClick={event => {
-							// Do not flip page
-							event.stopPropagation()
-							// TODO: Communicate with addon
+					<CMMContext.Consumer>
+						{cmm => {
+							const thisMod = cmm.mods.find(val => val.keyname === mod.keyname)
+							return (
+								<Button
+									onClick={event => {
+										// Do not flip page
+										event.stopPropagation()
+										if (!thisMod) cmm.submitMod(mod)
+										else cmm.unsubmitMod(mod.keyname)
+									}}
+									type="good"
+								>
+									{thisMod ? "Un" : "S"}ubscribe
+								</Button>
+							)
 						}}
-						type="good"
-					>
-						Subscribe
-					</Button>
+					</CMMContext.Consumer>
 				</VerticalList>
 			</Frame>
-		</Tooltip>
+		</div>
 	)
 }
 

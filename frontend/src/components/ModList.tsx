@@ -19,13 +19,7 @@ const ModList: React.FC<ModRowProps> = props => {
 	return (
 		<BaseRow>
 			{props.mods.map((mod, i) => (
-				<ModCard
-					name={mod.name}
-					desc={mod.description}
-					icon={mod.icon}
-					version={mod.version}
-					key={i}
-				/>
+				<ModCard mod={mod} key={i} />
 			))}
 		</BaseRow>
 	)

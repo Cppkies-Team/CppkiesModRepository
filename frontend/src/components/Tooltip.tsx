@@ -3,7 +3,7 @@ import { usePopper } from "react-popper"
 import Frame from "./Frame"
 import { Placement } from "@popperjs/core"
 interface TooltipProps {
-	popup: React.ReactNode
+	popup?: React.ReactNode
 	placement?: Placement
 	flip?: boolean
 	keepOpen?: boolean | null
@@ -40,7 +40,7 @@ const Tooltip: React.FC<TooltipProps> = props => {
 			{hovered && (
 				<Frame
 					ref={setPopperElement}
-					style={{ ...styles.popper, zIndex: 999, margin: 0 }}
+					style={{ ...styles.popper, zIndex: 999, margin: 0, fontSize: "90%" }}
 					onMouseOver={() => updateHoverState(true, true)}
 					onMouseOut={() => updateHoverState(false, true)}
 					{...attributes.popper}

@@ -1,6 +1,6 @@
 export type CCIcon = [number, number, string?]
 
-export interface UploadMod {
+export interface Mod {
 	/**
 	 * The unique keyname of the mod, can consist of
 	 * A-Z a-z 0-9 - _ . ! ~ * ' ( )
@@ -22,9 +22,6 @@ export interface UploadMod {
 	 * The version of the mod, must be in semver
 	 */
 	version: string
-}
-
-export interface Mod extends UploadMod {
 	/**
 	 * Timestamp of the mods creation
 	 */
@@ -33,4 +30,12 @@ export interface Mod extends UploadMod {
 	 * Id of the mod's uploader
 	 */
 	authorId: string
+	/**
+	 * The link to the code of the mod
+	 */
+	entrypoint: string
+	/**
+	 * Link to the package's package.json
+	 */
+	packageLink: string
 }
