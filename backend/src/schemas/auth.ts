@@ -6,6 +6,7 @@ export interface DBAuth {
 	discord_token_expire_date: string
 	admin: boolean
 	system: boolean
+	username?: string
 }
 
 export interface AuthLoginBodySchemaInterface {

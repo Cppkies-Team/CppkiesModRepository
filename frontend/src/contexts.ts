@@ -8,31 +8,23 @@ import CMMApi from "./cmm-api"
 interface LocalStorageData {
 	token: string
 	refreshToken: string
-}
-
-function validateLSTokens(obj: unknown): obj is LocalStorageData {
-	if (typeof obj !== "object" || obj === null) return false
-	if (!hasOwnProperty(obj, "token") || typeof obj.token !== "string")
-		return false
-	if (
-		!hasOwnProperty(obj, "refreshToken") ||
-		typeof obj.refreshToken !== "string"
-	)
-		return false
-	return true
+	tokenExpiryDate?: number
 }
 
 export function writeTokens(api: CoolReturnType<typeof CCRepoAPI>): void {
 	localStorage.setItem(
 		"tokens",
-		JSON.stringify({ token: api.apiKey, refreshToken: api.refreshToken })
+		JSON.stringify({
+			token: api.apiKey,
+			refreshToken: api.refreshToken,
+			tokenExpiryDate: Date.now() + api.tokenExpiresIn,
+		})
 	)
 }
 
 let tokens: LocalStorageData | null = null
 try {
-	const lsData = JSON.parse(localStorage.getItem("tokens") ?? "")
-	if (validateLSTokens(lsData)) tokens = lsData
+	tokens = JSON.parse(localStorage.getItem("tokens") ?? "")
 } catch {
 	// eslint-disable-next-line no-empty
 }
@@ -43,11 +35,14 @@ export const loginLink = `https://discord.com/oauth2/authorize?client_id=7941754
 
 export const defaultApi = new CCRepoAPI(tokens?.token, tokens?.refreshToken)
 
-// For good measure
-if (defaultApi.refreshToken)
+if (
+	defaultApi.refreshToken &&
+	tokens?.tokenExpiryDate &&
+	tokens.tokenExpiryDate - Date.now() < 1000 * 60 * 60 * 24 // If expiry date is < day
+)
 	defaultApi.updateToken().catch(() => console.warn("Couldn't refresh tokens."))
 
-defaultApi.on("userChange", () => writeTokens(defaultApi))
+defaultApi.on("tokenChange", () => writeTokens(defaultApi))
 
 export const ApiContext = React.createContext(defaultApi)
 

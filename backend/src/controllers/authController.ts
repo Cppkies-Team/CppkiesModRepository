@@ -4,7 +4,7 @@ import {
 	DBAuth,
 } from "../schemas/auth"
 import ControllerEndpoint from "../controllerHelper"
-import { oauth } from "../discord"
+import { fetchToken, getUser as getDiscordUser, refreshToken } from "../discord"
 import boom from "@hapi/boom"
 import db from "../db"
 import {
@@ -53,13 +53,11 @@ export const login = new ControllerEndpoint<{
 }>(
 	async req => {
 		try {
-			const discordReply = await oauth.tokenRequest({
-				redirectUri: req.body.redirectUrl,
-				code: req.body.code,
-				grantType: "authorization_code",
-				scope: "identify",
-			})
-			const user = await oauth.getUser(discordReply.access_token)
+			const discordReply = await fetchToken(
+				req.body.redirectUrl,
+				req.body.code
+			)
+			const user = await getDiscordUser(discordReply.access_token)
 			// Don't add to db if identical token exists
 			if (
 				(
@@ -76,10 +74,12 @@ export const login = new ControllerEndpoint<{
 					discord_token_expire_date: toDatabaseTimestamp(
 						new Date(Date.now() + discordReply.expires_in * 1000)
 					),
+					username: user.username,
 				})
 			return {
 				token: discordReply.access_token,
 				refreshToken: discordReply.refresh_token,
+				expiresIn: discordReply.expires_in * 1000,
 			}
 		} catch (err) {
 			throw boom.boomify(err)
@@ -100,12 +100,10 @@ export const refreshLogin = new ControllerEndpoint<{
 				res.code(400)
 				throw boom.badRequest("Bad Request")
 			}
-			const discordReply = await oauth.tokenRequest({
-				grantType: "refresh_token",
-				scope: "identify",
-				redirectUri: records[0].discord_redirect_uri,
-				refreshToken: records[0].discord_refresh_token,
-			})
+			const discordReply = await refreshToken(
+				records[0].discord_redirect_uri,
+				records[0].discord_refresh_token
+			)
 
 			await authDB()
 				.where({
@@ -121,6 +119,7 @@ export const refreshLogin = new ControllerEndpoint<{
 			return {
 				token: discordReply.access_token,
 				refreshToken: discordReply.refresh_token,
+				expiresIn: discordReply.expires_in * 1000,
 			}
 		} catch (err) {
 			throw boom.boomify(err)
@@ -142,11 +141,9 @@ export const getUserDetails = new ControllerEndpoint<{
 				throw boom.badRequest("Bad Request")
 			}
 
-			const discordUser = await oauth.getUser(user.discord_auth_token)
-
 			return {
 				id: user.discord_id,
-				tag: discordUser.username,
+				tag: user.username ?? "???",
 				admin: user.admin,
 				system: user.system,
 			}
@@ -167,14 +164,12 @@ export const getThisUserDetails = new ControllerEndpoint<{
 			const user = await getUser(req.headers.authentication)
 			if (!user) {
 				res.code(400)
-				throw boom.badRequest("Bad Request")
+				throw boom.badRequest("Invalid token")
 			}
-
-			const discordUser = await oauth.getUser(user.discord_auth_token)
 
 			return {
 				id: user.discord_id,
-				tag: discordUser.username,
+				tag: user.username ?? "???",
 				admin: user.admin,
 				system: user.system,
 			}

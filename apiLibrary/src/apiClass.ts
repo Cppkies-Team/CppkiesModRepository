@@ -1,7 +1,7 @@
 import { prod } from "../prod.json"
 import { User } from "./index"
 
-type ApiEvents = "userChange"
+type ApiEvents = "userChange" | "tokenChange"
 
 export default class CCRepoAPI {
 	_events = {} as Record<ApiEvents, (() => void)[] | undefined>
@@ -12,6 +12,7 @@ export default class CCRepoAPI {
 	redirectUrl = prod
 		? `${this.apiLink.substr(0, this.apiLink.length - 3)}login/`
 		: "http://localhost:5500/login/"
+	tokenExpiresIn: number = 0
 	constructor(public apiKey?: string, public refreshToken?: string) {
 		if (apiKey) this.getSelfUser()
 	}
@@ -45,6 +46,8 @@ export default class CCRepoAPI {
 		).json()
 		this.apiKey = res.token
 		this.refreshToken = res.refreshToken
+		this.tokenExpiresIn = res.expiresIn
+		this.emit("tokenChange")
 		await this.getSelfUser()
 	}
 	async updateToken(): Promise<void> {
@@ -55,6 +58,8 @@ export default class CCRepoAPI {
 		).json()
 		this.apiKey = res.token
 		this.refreshToken = res.refreshToken
+		this.tokenExpiresIn = res.expiresIn
+		this.emit("tokenChange")
 		await this.getSelfUser()
 	}
 	async getUser(id: number): Promise<User> {
