@@ -8,8 +8,9 @@ import { DBMod } from "./schemas/mods"
 	for (const mod of mods)
 		try {
 			bumpMod(mod.package_link, null, mod.keyname)
+			console.info(`Bumped mod ${mod.keyname}`)
 		} catch (err) {
-			console.warn(`Failed to bump mod: ${err}`)
+			console.warn(`Failed to bump mod ${mod.keyname}: ${err}`)
 		}
 	exit(0)
 })()

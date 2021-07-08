@@ -5,10 +5,10 @@
 		"moduleResolution": "node",
 		"sourceMap": true,
 		"incremental": true,
-		"strictNullChecks": true,
+		"strict": true,
 		"outDir": "dist",
 		"target": "ES2019",
-		"module": "commonjs"
+		"module": "CommonJS"
 	},
 	"include": ["src/**/*.ts"]
 }

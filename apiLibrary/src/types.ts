@@ -39,3 +39,10 @@ export interface Mod {
 	 */
 	packageLink: string
 }
+
+export interface User {
+	id: number
+	username: string
+	admin: boolean
+	system: boolean
+}

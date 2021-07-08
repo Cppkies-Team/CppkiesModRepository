@@ -1,10 +1,11 @@
 import { prod } from "../prod.json"
-import { User } from "./index"
+import { User } from "./types"
 
 type ApiEvents = "userChange" | "tokenChange"
+type LoginPlatform = "discord" | "github"
 
 export default class CCRepoAPI {
-	_events = {} as Record<ApiEvents, (() => void)[] | undefined>
+	_events: Partial<Record<ApiEvents, (() => void)[]>> = {}
 	user?: User
 	apiLink = prod
 		? "https://ccrepo.glander.club/api"
@@ -12,53 +13,37 @@ export default class CCRepoAPI {
 	redirectUrl = prod
 		? `${this.apiLink.substr(0, this.apiLink.length - 3)}login/`
 		: "http://localhost:5500/login/"
-	tokenExpiresIn: number = 0
-	constructor(public apiKey?: string, public refreshToken?: string) {
-		if (apiKey) this.getSelfUser()
+	constructor(public token?: string) {
+		if (token) this.getSelfUser()
 	}
 	async callApi(
 		method: "GET" | "POST" | "DELETE",
 		link: string,
 		body?: object
 	): Promise<Response> {
-		const res = await fetch(`${this.apiLink}/${link}`, {
-			headers: {
-				Authentication: this.apiKey ?? "",
-				...(body ? { "Content-Type": "application/json" } : {}),
-			},
-			method,
-			body: JSON.stringify(body),
-		})
+		const res = await fetch(
+			link.startsWith("http://") ? link : `${this.apiLink}/${link}`,
+			{
+				headers: {
+					Authentication: this.token ?? "",
+					...(body ? { "Content-Type": "application/json" } : {}),
+				},
+				method,
+				body: JSON.stringify(body),
+			}
+		)
 
-		if (!res.ok)
-			if ((await res.json()).message === "Invalid token") {
-				await this.updateToken()
-				return await this.callApi(method, link, body)
-			} else throw new Error(`${res.status}: ${res.statusText}`)
+		if (!res.ok) throw new Error(`${res.status}: ${res.statusText}`)
 		return res
 	}
-	async createToken(code: string): Promise<void> {
+	async createToken(code: string, platform: LoginPlatform): Promise<void> {
 		const res = await (
-			await this.callApi("POST", "login/", {
+			await this.callApi("POST", `login/${platform}`, {
 				code,
-				redirectUrl: this.redirectUrl,
+				redirectUrl: this.redirectUrl + platform,
 			})
 		).json()
-		this.apiKey = res.token
-		this.refreshToken = res.refreshToken
-		this.tokenExpiresIn = res.expiresIn
-		this.emit("tokenChange")
-		await this.getSelfUser()
-	}
-	async updateToken(): Promise<void> {
-		const res = await (
-			await this.callApi("POST", "login/refresh/", {
-				refreshToken: this.refreshToken,
-			})
-		).json()
-		this.apiKey = res.token
-		this.refreshToken = res.refreshToken
-		this.tokenExpiresIn = res.expiresIn
+		this.token = res.token
 		this.emit("tokenChange")
 		await this.getSelfUser()
 	}
@@ -78,5 +63,12 @@ export default class CCRepoAPI {
 	on(eventName: ApiEvents, func: () => void): void {
 		if (!this._events[eventName]) this._events[eventName] = [func]
 		else (this._events[eventName] as (() => void)[]).push(func) // Trust me
+	}
+	off(eventName: ApiEvents, func: () => void): void {
+		if (this._events[eventName]?.includes(func))
+			this._events[eventName]?.splice(
+				this._events[eventName]?.indexOf(func) ?? 0,
+				1
+			)
 	}
 }

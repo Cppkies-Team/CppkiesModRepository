@@ -1,5 +1,5 @@
 import * as Knex from "knex"
-import { DBAuth } from "../src/schemas/auth"
+import { DBDiscordAuth } from "../src/schemas/discordAuth"
 import { getUser, refreshToken } from "../src/discord"
 import { toDatabaseTimestamp } from "../src/helpers"
 
@@ -8,14 +8,14 @@ export async function up(knex: Knex): Promise<void> {
 		table.string("username")
 	})
 
-	for (const user of await knex<DBAuth>("discord_auth")) {
+	for (const user of await knex<DBDiscordAuth>("discord_auth")) {
 		try {
 			const discordReply = await refreshToken(
 				user.discord_redirect_uri,
 				user.discord_refresh_token
 			)
 			const discordUser = await getUser(discordReply.access_token)
-			await knex<DBAuth>("discord_auth")
+			await knex<DBDiscordAuth & { username: string }>("discord_auth")
 				.where({
 					discord_refresh_token: user.discord_refresh_token,
 				})

@@ -5,6 +5,6 @@
 		"resolveJsonModule": true,
 		"sourceMap": true,
 		"incremental": true,
-		"strictNullChecks": true
+		"strict": true
 	}
 }

@@ -17,7 +17,7 @@ export interface DBMod {
 	description: string
 	uploaded: string
 	icon: string
-	author_discord_id: string
+	author_id: number
 	version: string
 	package_link: string
 	entrypoint: string
@@ -32,7 +32,7 @@ export type UploadMod = {
 	main: string
 	description: string
 	version: string
-	author?: string
+	author: string
 	ccrepo?: {
 		icon?: CCIcon
 		entrypoint?: string
@@ -96,7 +96,7 @@ export interface Mod {
 	/**
 	 * Id of the mod's uploader
 	 */
-	authorId: string
+	authorId: number
 	/**
 	 * The link to the code of the mod
 	 */
@@ -148,7 +148,7 @@ export function DBModToMod(dbMod: DBMod): Mod {
 		uploaded: new Date(dbMod.uploaded).getTime(),
 		icon: JSON.parse(dbMod.icon),
 		version: dbMod.version,
-		authorId: dbMod.author_discord_id,
+		authorId: dbMod.author_id,
 		entrypoint: dbMod.entrypoint,
 		packageLink: dbMod.package_link,
 	}

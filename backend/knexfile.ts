@@ -23,4 +23,4 @@ export default {
 			database: process.env.DB_DB,
 		},
 	},
-} as const
+}

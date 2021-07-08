@@ -1,5 +1,5 @@
 import analyze from "rollup-plugin-analyzer"
-import minify from "rollup-plugin-babel-minify"
+import { terser } from "rollup-plugin-terser"
 import typescript from "rollup-plugin-typescript2"
 import resolve from "@rollup/plugin-node-resolve"
 import commonjs from "@rollup/plugin-commonjs"
@@ -16,14 +16,13 @@ export default {
 	plugins: [
 		typescript({
 			tsconfig: "./tsconfig.json",
+			objectHashIgnoreUnknownHack: true,
 		}),
 		resolve({ preferBuiltins: true, browser: true }),
 		analyze({
 			summaryOnly: true,
 		}),
-		minify({
-			comments: false,
-		}),
+		terser(),
 		commonjs(),
 		json(),
 	],

@@ -5,7 +5,7 @@ module.exports = {
 	entry: path.resolve("./src/index.tsx"),
 	output: {
 		path: path.resolve(__dirname, "dist"),
-		filename: "main.js",
+		filename: "[name].js",
 		publicPath: "/",
 	},
 	devtool: "source-map",
@@ -31,5 +31,18 @@ module.exports = {
 		compress: true,
 		port: 5500,
 		historyApiFallback: true,
+	},
+	optimization: {
+		splitChunks: {
+			cacheGroups: {
+				default: false,
+				vendors: false,
+				vendor: {
+					chunks: "all",
+					name: "vendor",
+					test: /node_modules/,
+				},
+			},
+		},
 	},
 }

@@ -1,24 +1,26 @@
 {
 	"name": "cppkies-mod-repository-backend",
 	"private": true,
-	"version": "0.0.0",
+	"version": "0.1.0",
 	"description": "",
 	"main": "./dist/index.js",
 	"scripts": {
 		"build": "npx tsc",
 		"eslint": "npx eslint ./src/*.jsx ./src/**/*.jsx ./src/**/*.js *.js",
 		"watch": "npx tsc --watch",
-		"eslint:fix": "npm run eslint -- --fix"
+		"eslint:fix": "npm run eslint -- --fix",
+		"start": "node dist/index.js"
 	},
 	"author": "G lander",
 	"license": "MIT",
 	"dependencies": {
 		"@hapi/boom": "^9.1.1",
+		"crypto-random-string": "^3.3.1",
 		"discord-oauth2": "^2.6.0",
 		"dotenv": "^8.2.0",
 		"fastify": "^3.9.2",
 		"fastify-cors": "^5.1.0",
-		"knex": "^0.21.15",
+		"knex": "^0.21.19",
 		"mysql2": "^2.2.5",
 		"superagent": "^6.1.0"
 	},

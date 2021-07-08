@@ -11,9 +11,10 @@ import {
 import {
 	AuthenticationHeaderSchema,
 	AuthenticationHeaderSchemaInterface,
+	DBAuth,
 } from "../schemas/auth"
 import { getUser, getUserById } from "./authController"
-import { DBAuth } from "../schemas/auth"
+import { DBDiscordAuth } from "../schemas/discordAuth"
 import { toDatabaseTimestamp } from "../helpers"
 import sa from "superagent"
 import ajv from "ajv"
@@ -44,6 +45,10 @@ export async function bumpMod(
 	token: string | null,
 	keyname?: string
 ): Promise<void> {
+	// Get the bumper
+	const bumper = token === null ? null : await getUser(token)
+	if (!bumper && token !== null) throw boom.unauthorized("Invalid token")
+
 	let res: any // Typescript never recasts it if it's `unknown`, *why*
 	try {
 		res = JSON.parse((await sa(link)).text)
@@ -57,7 +62,7 @@ export async function bumpMod(
 
 	if (
 		(keyname && res.name !== keyname) ||
-		(!keyname && (await modDB().where({ keyname: res.name })).length !== 0)
+		(!keyname && (await modDB().where({ keyname: res.name }).first()))
 	)
 		if (keyname)
 			throw boom.badRequest(
@@ -66,19 +71,20 @@ export async function bumpMod(
 		else throw boom.badRequest("Mod with keyname already exists")
 
 	let author: DBAuth
-	// Get the bumper
-	const bumper = token ? await getUser(token) : null
-	if (!bumper && token) throw boom.unauthorized("Invalid token")
 	// Check if mod exists
-	const oldMod: DBMod | undefined = (
-		await modDB().where({ keyname: res.name })
-	)[0]
+	const oldMod: DBMod | undefined = await modDB()
+		.where({ keyname: res.name })
+		.first()
 	if (!oldMod) {
 		if (!bumper) throw boom.internal() // System submitted a mod
 		author = bumper
 	} else {
-		const ogAuthor = await getUserById(oldMod.author_discord_id)
+		const ogAuthor = await getUserById(oldMod.author_id)
 		if (!ogAuthor) throw boom.internal("Mod author doesn't exist!")
+		if (bumper && ogAuthor.user_id !== bumper.user_id)
+			throw boom.unauthorized(
+				"Only the owner can publish new mod versions!"
+			)
 		author = ogAuthor
 	}
 
@@ -89,7 +95,7 @@ export async function bumpMod(
 		description: res.description,
 		entrypoint: res.ccrepo?.entrypoint ?? res.main,
 		uploaded: oldMod ? oldMod.uploaded : toDatabaseTimestamp(new Date()),
-		author_discord_id: author.discord_id,
+		author_id: author.user_id,
 		icon: JSON.stringify(res.ccrepo?.icon || null),
 		package_link: link,
 		etc: "{}",

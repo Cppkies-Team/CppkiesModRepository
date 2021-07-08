@@ -7,17 +7,13 @@ import CMMApi from "./cmm-api"
 //#region API context
 interface LocalStorageData {
 	token: string
-	refreshToken: string
-	tokenExpiryDate?: number
 }
 
 export function writeTokens(api: CoolReturnType<typeof CCRepoAPI>): void {
 	localStorage.setItem(
 		"tokens",
 		JSON.stringify({
-			token: api.apiKey,
-			refreshToken: api.refreshToken,
-			tokenExpiryDate: Date.now() + api.tokenExpiresIn,
+			token: api.token,
 		})
 	)
 }
@@ -29,18 +25,16 @@ try {
 	// eslint-disable-next-line no-empty
 }
 
-export const loginLink = `https://discord.com/oauth2/authorize?client_id=794175481225150465&redirect_uri=${
-	prod ? "https://ccrepo.glander.club" : "http://localhost:5500"
-}/login/&response_type=code&scope=identify`
+export const loginLinks = {
+	discord: `https://discord.com/oauth2/authorize?client_id=794175481225150465&redirect_uri=${
+		prod ? "https://ccrepo.glander.club" : "http://localhost:5500"
+	}/login/discord&response_type=code&scope=identify`,
+	github: `https://github.com/login/oauth/authorize?client_id=${
+		prod ? "65316f25efec8b9bf2c4" : "8a25261deb974c3a769d"
+	}&scope=read:user`,
+}
 
-export const defaultApi = new CCRepoAPI(tokens?.token, tokens?.refreshToken)
-
-if (
-	defaultApi.refreshToken &&
-	tokens?.tokenExpiryDate &&
-	tokens.tokenExpiryDate - Date.now() < 1000 * 60 * 60 * 24 // If expiry date is < day
-)
-	defaultApi.updateToken().catch(() => console.warn("Couldn't refresh tokens."))
+export const defaultApi = new CCRepoAPI(tokens?.token)
 
 defaultApi.on("tokenChange", () => writeTokens(defaultApi))
 

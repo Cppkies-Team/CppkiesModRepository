@@ -1,46 +1,42 @@
-import React, { useEffect, useState } from "react"
+import React, { useContext, useEffect, useState } from "react"
 import { Redirect } from "react-router-dom"
-import { ApiContext, loginLink } from "../contexts"
+import { ApiContext, loginLinks } from "../contexts"
 import { VerticalFrame } from "./Frame"
 import FancyName from "./FancyName"
 const LoginRedirecter: React.FC = () => {
 	const [isDone, setIsDone] = useState(false)
-	const [isLoading, setIsLoading] = useState(false)
-	let mounted = true
+	const api = useContext(ApiContext)
+	const token = /code=([^&$]+)(?:&|$)/.exec(location.search)?.[1]
+	const provider = /login\/(\w+)/.exec(location.pathname)?.[1] as
+		| "github"
+		| "discord"
+
+	if (!provider) return <Redirect to="/" />
+
 	useEffect(() => {
-		mounted = true
-		return () => {
-			mounted = false
+		if (!token) return
+		let setResponse = true
+		api
+			.createToken(token, provider)
+			.then(() => setResponse && setIsDone(true))
+			.catch(err => {
+				console.error(err)
+				setResponse && setIsDone(true)
+			})
+		return (): void => {
+			setResponse = false
 		}
 	}, [])
-	return (
-		<ApiContext.Consumer>
-			{api => {
-				const token = /code=([^&$]+)(?:&|$)/.exec(location.search)?.[1]
-				if (!isLoading)
-					if (token)
-						api
-							.createToken(token)
-							.then(() => {
-								if (mounted) setIsDone(true)
-							})
-							.catch(err => {
-								console.error(err)
-								if (mounted) setIsDone(true)
-							})
-					else location.assign(loginLink)
 
-				setIsLoading(true)
-				if (isDone) return <Redirect to="/" />
-				else
-					return (
-						<VerticalFrame>
-							<FancyName>Logging in...</FancyName>
-						</VerticalFrame>
-					)
-			}}
-		</ApiContext.Consumer>
-	)
+	if (!token) location.assign(loginLinks[provider])
+
+	if (isDone) return <Redirect to="/" />
+	else
+		return (
+			<VerticalFrame>
+				<FancyName>Logging in...</FancyName>
+			</VerticalFrame>
+		)
 }
 
 export default LoginRedirecter

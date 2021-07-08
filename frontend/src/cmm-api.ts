@@ -9,17 +9,17 @@ export interface CMMMod extends Mod {
 class CMMApi {
 	connected = false
 	connectTimeoutId: number
-	_events = {} as Record<ApiEvents, (() => void)[] | undefined>
+	_events: Partial<Record<ApiEvents, (() => void)[]>> = {}
 	mods: CMMMod[] = []
 	constructor() {
 		window.addEventListener("message", (ev: MessageEvent) => {
 			if (typeof ev.data === "string" && ev.data.startsWith("cmm-ccrepo-"))
 				this.processEvent(ev.data)
 		})
-		this.connectTimeoutId = (setInterval(() => {
+		this.connectTimeoutId = setInterval(() => {
 			if (!this.connected) window.postMessage("ccrepo-cmm-connect", "*")
 			else clearInterval(this.connectTimeoutId)
-		}, 100) as unknown) as number // Dumb TS
+		}, 100) as unknown as number // Dumb TS
 	}
 	processEvent(data: string): void {
 		this.connected = true
