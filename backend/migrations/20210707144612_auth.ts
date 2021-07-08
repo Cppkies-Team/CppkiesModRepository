@@ -61,7 +61,7 @@ export async function up(knex: Knex): Promise<void> {
 	// knex.raw()
 	await knex.schema.alterTable("mods", table => {
 		table.integer("author_id", 10).unsigned()
-		table.foreign("author_id").references("auth.id")
+		table.foreign("author_id").references("auth.user_id")
 	})
 	for (const mod of await knex<DBMod & { author_discord_id: string }>(
 		"mods"
