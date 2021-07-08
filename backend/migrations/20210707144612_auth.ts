@@ -17,10 +17,12 @@ export async function up(knex: Knex): Promise<void> {
 	await knex.schema.table("discord_auth", table => {
 		table.integer("user_id", 10).unsigned()
 		table.foreign("user_id").references("auth.user_id")
-		table.dropColumns("admin", "system", "username")
+		table.dropColumns("admin", "system")
 	})
 
-	for (const discordUser of await knex<DBDiscordAuth>("discord_auth")) {
+	for (const discordUser of await knex<DBDiscordAuth & { username: string }>(
+		"discord_auth"
+	)) {
 		let username: string | undefined
 		try {
 			const discordReply = await refreshToken(
@@ -30,9 +32,11 @@ export async function up(knex: Knex): Promise<void> {
 			const discordUserInfo = await getUser(discordReply.access_token)
 			username = `${discordUserInfo.username}#${discordUserInfo.discriminator}`
 		} catch (err) {
-			console.warn(
-				`Don't know the username of user ${discordUser.discord_id}!`
-			)
+			if (discordUser.username) username = discordUser.username
+			else
+				console.warn(
+					`Don't know the username of user ${discordUser.discord_id}!`
+				)
 		}
 		const newToken = generateToken()
 		await knex<DBAuth>("auth").insert({
@@ -56,6 +60,9 @@ export async function up(knex: Knex): Promise<void> {
 			})
 			.update({ user_id: userId })
 	}
+	await knex.schema.table("discord_auth", table => {
+		table.dropColumn("username")
+	})
 	//#endregion
 	// #region Migrate the mods table
 	// knex.raw()
