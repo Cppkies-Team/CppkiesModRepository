@@ -9,13 +9,13 @@ export async function up(knex: Knex): Promise<void> {
 	//#region Migrate the discord_auth and auth tables
 	await knex.schema.createTable("auth", table => {
 		table.string("token").notNullable()
-		table.increments("user_id")
+		table.increments("user_id").unsigned()
 		table.boolean("admin").notNullable().defaultTo(false)
 		table.boolean("system").notNullable().defaultTo(false)
 		table.string("username")
 	})
 	await knex.schema.table("discord_auth", table => {
-		table.integer("user_id")
+		table.integer("user_id", 10).unsigned()
 		table.foreign("user_id").references("auth.user_id")
 		table.dropColumns("admin", "system", "username")
 	})
