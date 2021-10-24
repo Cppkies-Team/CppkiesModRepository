@@ -3,8 +3,7 @@ import { Mod } from "../types"
 import ModList from "./ModList"
 import { VerticalFrame } from "./Frame"
 import FancyName from "./FancyName"
-import { ApiContext } from "../contexts"
-import { CMMMod } from "../cmm-api"
+import { ApiContext, CMMContext } from "../contexts"
 
 const AllModsList: React.FC = () => {
 	const [isError, setIsError] = useState(false)
@@ -15,7 +14,7 @@ const AllModsList: React.FC = () => {
 		let recordResult = true
 		api
 			.getMods()
-			.then(res => recordResult && setResult(res))
+			.then((res) => recordResult && setResult(res))
 			.catch(() => recordResult && setIsError(true))
 		return () => {
 			recordResult = false

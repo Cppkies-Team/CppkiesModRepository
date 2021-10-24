@@ -1,8 +1,8 @@
-import React from "react"
+import React, { useContext, useEffect, useState } from "react"
 import CCRepoAPI from "../../apiLibrary/"
 import { CoolReturnType, hasOwnProperty } from "./helpers"
 import { prod } from "../prod.json"
-import CMMApi from "./cmm-api"
+import CMMApi, { CMMMod } from "./cmm-api"
 
 //#region API context
 interface LocalStorageData {
@@ -46,5 +46,16 @@ export const ApiContext = React.createContext(defaultApi)
 export const defaultCMMApi = new CMMApi()
 
 export const CMMContext = React.createContext(defaultCMMApi)
+
+export function useCMMMod(keyname: string): CMMMod | undefined {
+	const cmm = useContext(CMMContext)
+	const [, shouldChange] = useState(0)
+	useEffect(() => {
+		const func = () => shouldChange(Math.random())
+		cmm.on("modChange", func)
+		return () => cmm.off("modChange", func)
+	}, [cmm])
+	return cmm.mods.find(val => val.keyname === keyname)
+}
 
 //#endregion

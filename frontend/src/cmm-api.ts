@@ -9,7 +9,7 @@ export interface CMMMod extends Mod {
 class CMMApi {
 	connected = false
 	connectTimeoutId: number
-	_events: Partial<Record<ApiEvents, (() => void)[]>> = {}
+	_events: Record<ApiEvents, (() => void)[]> = { modChange: [] }
 	mods: CMMMod[] = []
 	constructor() {
 		window.addEventListener("message", (ev: MessageEvent) => {
@@ -29,12 +29,15 @@ class CMMApi {
 		}
 	}
 	emit(eventName: ApiEvents): void {
-		if (!this._events[eventName]) this._events[eventName] = []
-		else (this._events[eventName] as (() => void)[]).forEach(val => val())
+		this._events[eventName].forEach((val) => val())
 	}
 	on(eventName: ApiEvents, func: () => void): void {
-		if (!this._events[eventName]) this._events[eventName] = [func]
-		else (this._events[eventName] as (() => void)[]).push(func) // Trust me
+		this._events[eventName].push(func)
+	}
+	off(eventName: ApiEvents, func: () => void): void {
+		const index = this._events[eventName].indexOf(func)
+		if (index === -1) return
+		this._events[eventName].splice(index, 1)
 	}
 	submitMod(mod: Mod): void {
 		window.postMessage(`ccrepo-cmm-submit-${JSON.stringify(mod)}`, "*")

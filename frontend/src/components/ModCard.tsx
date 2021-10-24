@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useContext, useEffect, useState } from "react"
 import { Mod } from "../types"
 import Icon from "./Icon"
 import Quote from "./Quote"
@@ -7,7 +7,7 @@ import styled from "styled-components"
 import Tooltip from "./Tooltip"
 import Frame from "./Frame"
 import Button from "./Button"
-import { CMMContext } from "../contexts"
+import { CMMContext, useCMMMod } from "../contexts"
 
 interface ModCardProps {
 	mod: Mod
@@ -31,6 +31,9 @@ const WidthedQuote = styled(Quote)`
 
 const ModCard: React.FC<ModCardProps> = ({ mod }) => {
 	const [inDetails, setInDetails] = useState(false)
+	const cmm = useContext(CMMContext)
+	const thisMod = useCMMMod(mod.keyname)
+
 	return (
 		<div>
 			<Frame
@@ -59,24 +62,17 @@ const ModCard: React.FC<ModCardProps> = ({ mod }) => {
 						justifyContent: "center",
 					}}
 				>
-					<CMMContext.Consumer>
-						{cmm => {
-							const thisMod = cmm.mods.find(val => val.keyname === mod.keyname)
-							return (
-								<Button
-									onClick={event => {
-										// Do not flip page
-										event.stopPropagation()
-										if (!thisMod) cmm.submitMod(mod)
-										else cmm.unsubmitMod(mod.keyname)
-									}}
-									type="good"
-								>
-									{thisMod ? "Un" : "S"}ubscribe
-								</Button>
-							)
+					<Button
+						onClick={event => {
+							// Do not flip page
+							event.stopPropagation()
+							if (!thisMod) cmm.submitMod(mod)
+							else cmm.unsubmitMod(mod.keyname)
 						}}
-					</CMMContext.Consumer>
+						type="good"
+					>
+						{thisMod ? "Un" : "S"}ubscribe
+					</Button>
 				</VerticalList>
 			</Frame>
 		</div>
