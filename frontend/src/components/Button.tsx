@@ -51,7 +51,7 @@ interface ButtonProps {
 	onClick?: (event: React.MouseEvent<HTMLSpanElement, MouseEvent>) => void
 }
 
-const Button: React.FC<ButtonProps> = props => {
+const Button: React.FC<ButtonProps> = React.memo(props => {
 	const style: React.CSSProperties = {}
 	if (props.off || props.disabled) style.opacity = 0.5
 	if (props.disabled) {
@@ -79,6 +79,6 @@ const Button: React.FC<ButtonProps> = props => {
 				</GoodButton>
 			)
 	}
-}
+})
 
 export default Button

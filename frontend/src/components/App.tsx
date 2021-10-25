@@ -12,33 +12,33 @@ import AllModsList from "./AllModsList"
 import { ApiContext, defaultApi, CMMContext, defaultCMMApi } from "../contexts"
 import LoginRedirecter from "./LoginRedirecter"
 import TopBar from "./TopBar"
+import WelcomeNote from "./WelcomeNote"
 
-export default class App extends React.Component {
-	render(): JSX.Element {
-		return (
-			<ApiContext.Provider value={defaultApi}>
-				<CMMContext.Provider value={defaultCMMApi}>
-					<Router>
-						<ShowerBackground />
-						<TopBar />
-						<Switch>
-							<Route path="/all">
-								<AllModsList />
-							</Route>
-							{/* TODO: Main page*/}
-							<Redirect exact from="/" to="/all" />
-							<Route path="/login/">
-								<LoginRedirecter />
-							</Route>
-							<Route path="*">
-								<VerticalFrame>
-									<FancyName>404!</FancyName>
-								</VerticalFrame>
-							</Route>
-						</Switch>
-					</Router>
-				</CMMContext.Provider>
-			</ApiContext.Provider>
-		)
-	}
-}
+const App: React.FC = () => (
+	<ApiContext.Provider value={defaultApi}>
+		<CMMContext.Provider value={defaultCMMApi}>
+			<Router>
+				<ShowerBackground />
+				<TopBar />
+				<Switch>
+					<Route path="/all">
+						<AllModsList />
+					</Route>
+					<Route path="/" exact>
+						<WelcomeNote />
+						<AllModsList />
+					</Route>
+					<Route path="/login/">
+						<LoginRedirecter />
+					</Route>
+					<Route path="*">
+						<VerticalFrame>
+							<FancyName>404!</FancyName>
+						</VerticalFrame>
+					</Route>
+				</Switch>
+			</Router>
+		</CMMContext.Provider>
+	</ApiContext.Provider>
+)
+export default App

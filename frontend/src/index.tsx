@@ -11,6 +11,11 @@ const Style = createGlobalStyle`
 		min-height: 100vh;
 		overflow-x: hidden;
 	}
+	a, a:visited {
+		text-decoration: underline;
+		cursor: pointer;
+		color: #ccc;
+	}
 `
 render(
 	<React.StrictMode>
