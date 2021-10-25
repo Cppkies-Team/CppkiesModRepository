@@ -23,18 +23,20 @@ interface ProppedShowerProps {
 	offset?: number
 }
 
-const ProppedShower: React.FC<ProppedShowerProps> = ({ offset = 0 }) => {
-	return (
-		<ShowerBase
-			style={{
-				animationDelay: `${offset / -10}s`,
-				backgroundPositionX: offset,
-			}}
-		/>
-	)
-}
+const ProppedShower: React.FC<ProppedShowerProps> = React.memo(
+	({ offset = 0 }) => {
+		return (
+			<ShowerBase
+				style={{
+					animationDelay: `${offset / -10}s`,
+					backgroundPositionX: offset,
+				}}
+			/>
+		)
+	}
+)
 
-const ShowerBackground: React.FC = () => {
+const ShowerBackground: React.FC = React.memo(() => {
 	return (
 		<div id="shower">
 			<ProppedShower />
@@ -45,6 +47,6 @@ const ShowerBackground: React.FC = () => {
 			<ProppedShower offset={110} />
 		</div>
 	)
-}
+})
 
 export default ShowerBackground

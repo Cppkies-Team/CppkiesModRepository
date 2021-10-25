@@ -8,6 +8,7 @@ import Tooltip from "./Tooltip"
 import Frame from "./Frame"
 import Button from "./Button"
 import { CMMContext, useCMMMod } from "../contexts"
+import Input from "./Input"
 
 interface ModCardProps {
 	mod: Mod
@@ -31,9 +32,18 @@ const WidthedQuote = styled(Quote)`
 
 const ModCard: React.FC<ModCardProps> = ({ mod }) => {
 	const [inDetails, setInDetails] = useState(false)
+	const [showCopied, setShowCopied] = useState(false)
 	const cmm = useContext(CMMContext)
 	const thisMod = useCMMMod(mod.keyname)
 
+	useEffect(() => {
+		if (!showCopied) return
+		const timeoutId = setTimeout(
+			() => setShowCopied(false),
+			750
+		) as unknown as number
+		return () => clearTimeout(timeoutId)
+	}, [showCopied])
 	return (
 		<div>
 			<Frame
@@ -50,6 +60,7 @@ const ModCard: React.FC<ModCardProps> = ({ mod }) => {
 						""
 					)}
 				</VerticalList>
+
 				<VerticalList
 					style={{
 						// Mm, CSS
@@ -62,17 +73,34 @@ const ModCard: React.FC<ModCardProps> = ({ mod }) => {
 						justifyContent: "center",
 					}}
 				>
-					<Button
-						onClick={event => {
-							// Do not flip page
-							event.stopPropagation()
-							if (!thisMod) cmm.submitMod(mod)
-							else cmm.unsubmitMod(mod.keyname)
-						}}
-						type="good"
-					>
-						{thisMod ? "Un" : "S"}ubscribe
-					</Button>
+					{(location.protocol === "https:" ||
+						location.hostname === "localhost") && (
+						<Button
+							onClick={async event => {
+								// Do not flip page
+								event.stopPropagation()
+								await navigator.clipboard.writeText(
+									new URL(mod.entrypoint, mod.packageLink).href
+								)
+								setShowCopied(true)
+							}}
+						>
+							{showCopied ? "Copied!" : "Copy link"}
+						</Button>
+					)}
+					{cmm.connected && (
+						<Button
+							onClick={event => {
+								// Do not flip page
+								event.stopPropagation()
+								if (!thisMod) cmm.submitMod(mod)
+								else cmm.unsubmitMod(mod.keyname)
+							}}
+							type="good"
+						>
+							{thisMod ? "Uns" : "S"}ubscribe
+						</Button>
+					)}
 				</VerticalList>
 			</Frame>
 		</div>

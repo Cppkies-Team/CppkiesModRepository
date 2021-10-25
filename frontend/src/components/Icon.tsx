@@ -18,22 +18,21 @@ interface IconProps2 {
 	icon: CCIcon
 }
 
-export default class Icon extends React.Component<IconProps1 | IconProps2> {
-	render(): JSX.Element {
-		let icon: CCIcon
-		if (hasOwnProperty(this.props, "x"))
-			icon = [this.props.x, this.props.y, this.props.link]
-		else icon = this.props.icon
-		//this.props.
-		return (
-			<IconBase
-				style={{
-					backgroundPosition: `${icon[0] * -48}px ${icon[1] * -48}px`,
-					backgroundImage: `url(${
-						icon[2] ?? "//orteil.dashnet.org/cookieclicker/img/icons.png"
-					})`,
-				}}
-			/>
-		)
-	}
-}
+const Icon: React.FC<IconProps1 | IconProps2> = React.memo(props => {
+	let icon: CCIcon
+	if (hasOwnProperty(props, "x")) icon = [props.x, props.y, props.link]
+	else icon = props.icon
+
+	return (
+		<IconBase
+			style={{
+				backgroundPosition: `${icon[0] * -48}px ${icon[1] * -48}px`,
+				backgroundImage: `url(${
+					icon[2] ?? "//orteil.dashnet.org/cookieclicker/img/icons.png"
+				})`,
+			}}
+		/>
+	)
+})
+
+export default Icon
