@@ -56,6 +56,12 @@ export default class CCRepoAPI {
 		this.emit("userChange")
 		return ret
 	}
+	logout(): void {
+		delete this.token
+		delete this.user
+		this.emit("tokenChange")
+		this.emit("userChange")
+	}
 	emit(eventName: ApiEvents): void {
 		if (!this._events[eventName]) this._events[eventName] = []
 		else (this._events[eventName] as (() => void)[]).forEach(val => val())

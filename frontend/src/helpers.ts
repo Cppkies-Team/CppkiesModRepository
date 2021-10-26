@@ -14,8 +14,6 @@ export type CoolReturnType<
 	T extends
 		| ((...args: unknown[]) => unknown)
 		| (new (...args: unknown[]) => unknown)
-> = T extends
-	| ((...args: unknown[]) => infer R)
-	| (new (...args: unknown[]) => infer R)
+> = T extends ((...args: any[]) => infer R) | (new (...args: any[]) => infer R)
 	? R
 	: never

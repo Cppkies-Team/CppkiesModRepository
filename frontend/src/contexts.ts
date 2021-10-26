@@ -10,12 +10,14 @@ interface LocalStorageData {
 }
 
 export function writeTokens(api: CoolReturnType<typeof CCRepoAPI>): void {
-	localStorage.setItem(
-		"tokens",
-		JSON.stringify({
-			token: api.token,
-		})
-	)
+	if (!api.token) localStorage.removeItem("tokens")
+	else
+		localStorage.setItem(
+			"tokens",
+			JSON.stringify({
+				token: api.token,
+			})
+		)
 }
 
 let tokens: LocalStorageData | null = null

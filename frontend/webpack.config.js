@@ -1,5 +1,6 @@
 const path = require("path")
 const HTMLPlugin = require("html-webpack-plugin")
+const CopyPlugin = require("copy-webpack-plugin")
 
 module.exports = {
 	entry: path.resolve("./src/index.tsx"),
@@ -25,12 +26,16 @@ module.exports = {
 			template: "./src/index.html",
 			filename: "index.html",
 		}),
+		new CopyPlugin({
+			patterns: [{ from: "./src/assets", to: "./assets" }],
+		}),
 	],
 	devServer: {
 		contentBase: path.join(__dirname, "dist"),
 		compress: true,
 		port: 5500,
 		historyApiFallback: true,
+		writeToDisk: true,
 	},
 	optimization: {
 		splitChunks: {
