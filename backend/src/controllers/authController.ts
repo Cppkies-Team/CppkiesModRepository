@@ -12,6 +12,7 @@ import {
 	UserDetailsBodySchema,
 	DBAuth,
 } from "../schemas/auth"
+import { DBDiscordAuth, DBGithubAuth } from "../schemas/appAuth"
 
 const authDB = () => db<DBAuth>("auth")
 
@@ -41,6 +42,18 @@ export async function getUserById(id: number): Promise<DBAuth | null> {
 	return (await authDB().where({ user_id: id }).first()) ?? null
 }
 
+async function findBindedPlatforms(userId: number): Promise<string[]> {
+	const foundPlatforms: string[] = []
+	for (const platform of ["github", "discord"])
+		if (
+			await db<DBDiscordAuth | DBGithubAuth>(`${platform}_auth`)
+				.where({ user_id: userId })
+				.first()
+		)
+			foundPlatforms.push(platform)
+	return foundPlatforms
+}
+
 export const getUserDetails = new ControllerEndpoint<{
 	Body: UserDetailsBodySchemaInterface
 }>(
@@ -57,6 +70,7 @@ export const getUserDetails = new ControllerEndpoint<{
 				username: user.username,
 				admin: user.admin,
 				system: user.system,
+				bindedPlatforms: await findBindedPlatforms(user.user_id),
 			}
 		} catch (err) {
 			throw boom.boomify(err)
@@ -83,6 +97,7 @@ export const getThisUserDetails = new ControllerEndpoint<{
 				username: user.username,
 				admin: user.admin,
 				system: user.system,
+				bindedPlatforms: await findBindedPlatforms(user.user_id),
 			}
 		} catch (err) {
 			throw boom.boomify(err)

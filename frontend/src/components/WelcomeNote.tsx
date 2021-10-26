@@ -40,8 +40,9 @@ const WelcomeNote: React.FC = React.memo(() => (
 		</a>
 		) you can click the Subscribe button to add it to your mod list!
 		<br />
-		Currently, only Discord authentification is supported (for mod uploads), but
-		GitHub authentification is being worked on!
+		You can login with either Discord or Github to upload mods! There's no way
+		to merge the accounts so that both log in to the same account, but that will
+		be a thing!
 		<br />
 		Do note that the Cppkies version this is supposed to co-launch with (0.3) is
 		not out yet, so this is a bit of a preview than an actual production service

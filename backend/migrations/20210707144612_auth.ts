@@ -1,5 +1,5 @@
 import * as Knex from "knex"
-import { DBDiscordAuth } from "../src/schemas/discordAuth"
+import { DBDiscordAuth } from "../src/schemas/appAuth"
 import { generateToken } from "../src/controllers/authController"
 import { DBAuth } from "../src/schemas/auth"
 import { DBMod } from "../src/schemas/mods"
@@ -70,16 +70,12 @@ export async function up(knex: Knex): Promise<void> {
 		table.integer("author_id", 10).unsigned()
 		table.foreign("author_id").references("auth.user_id")
 	})
-	for (const mod of await knex<DBMod & { author_discord_id: string }>(
-		"mods"
-	)) {
+	for (const mod of await knex<DBMod & { author_discord_id: string }>("mods")) {
 		const modOwner = await knex<DBDiscordAuth>("discord_auth")
 			.where({ discord_id: mod.author_discord_id })
 			.first()
 		if (!modOwner) throw new Error("This should never happen")
-		await knex<DBMod>("mods")
-			.where(mod)
-			.update({ author_id: modOwner.user_id })
+		await knex<DBMod>("mods").where(mod).update({ author_id: modOwner.user_id })
 	}
 	await knex.schema.alterTable("mods", table => {
 		table.dropColumn("author_discord_id")

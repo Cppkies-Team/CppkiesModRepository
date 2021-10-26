@@ -7,12 +7,19 @@ export interface DBDiscordAuth {
 	user_id: number
 }
 
-export interface AuthDiscordLoginBodySchemaInterface {
+export interface DBGithubAuth {
+	github_id: number
+	github_auth_token: string
+	github_redirect_uri: string
+	user_id: number
+}
+
+export interface AuthLoginBodySchemaInterface {
 	code: string
 	redirectUrl: string
 }
 
-export const AuthDiscordLoginBodySchema = {
+export const AuthLoginBodySchema = {
 	type: "object",
 	properties: {
 		code: {
@@ -21,20 +28,5 @@ export const AuthDiscordLoginBodySchema = {
 		redirectUrl: { type: "string" },
 	},
 	required: ["code", "redirectUrl"],
-	additionalProperties: false,
-}
-
-export interface RefreshDiscordLoginBodySchemaInterface {
-	refreshToken: string
-}
-
-export const RefreshDiscordLoginBodySchema = {
-	type: "object",
-	properties: {
-		refreshToken: {
-			type: "string",
-		},
-	},
-	required: ["refreshToken"],
 	additionalProperties: false,
 }

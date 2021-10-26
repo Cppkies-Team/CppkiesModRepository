@@ -1,5 +1,5 @@
 import * as Knex from "knex"
-import { DBDiscordAuth } from "../src/schemas/discordAuth"
+import { DBDiscordAuth } from "../src/schemas/appAuth"
 import { getUser, refreshToken } from "../src/discord"
 import { toDatabaseTimestamp } from "../src/helpers"
 

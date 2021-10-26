@@ -1,5 +1,5 @@
 import { prod } from "../prod.json"
-import { User } from "./types"
+import { User, Mod } from "./types"
 
 type ApiEvents = "userChange" | "tokenChange"
 type LoginPlatform = "discord" | "github"
@@ -76,5 +76,11 @@ export default class CCRepoAPI {
 				this._events[eventName]?.indexOf(func) ?? 0,
 				1
 			)
+	}
+	async getMods(): Promise<Mod[]> {
+		return (await (await this.callApi("GET", "mods/")).json()).mods // I am too lazy to validate it, heh
+	}
+	async submitMod(link: string): Promise<void> {
+		await this.callApi("POST", "mods/submit", { link })
 	}
 }

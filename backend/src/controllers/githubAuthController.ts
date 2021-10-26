@@ -1,52 +1,58 @@
-import { boomify } from "@hapi/boom"
+import { badRequest, boomify } from "@hapi/boom"
 import ControllerEndpoint from "../controllerHelper"
 import db from "../db"
-import { fetchToken, getUser } from "../discord"
 import { toDatabaseTimestamp } from "../helpers"
 import { DBAuth } from "../schemas/auth"
 import {
 	AuthLoginBodySchema,
 	AuthLoginBodySchemaInterface,
-	DBDiscordAuth,
+	DBGithubAuth,
 } from "../schemas/appAuth"
 import { generateToken, getUserById } from "./authController"
+import { OAuthApp } from "@octokit/oauth-app"
 
-const discordAuthDB = () => db.table<DBDiscordAuth>("discord_auth")
+const app = new OAuthApp({
+	clientId: process.env.GITHUB_APP_ID ?? "",
+	clientSecret: process.env.GITHUB_APP_SECRET ?? "",
+})
+
+const githubAuthDB = () => db.table<DBGithubAuth>("github_auth")
 const authDB = () => db<DBAuth>("auth")
 
-export const discordLogin = new ControllerEndpoint<{
+export const githubLogin = new ControllerEndpoint<{
 	Body: AuthLoginBodySchemaInterface
 }>(
 	async req => {
 		try {
-			const discordReply = await fetchToken(req.body.redirectUrl, req.body.code)
-			const discordUser = await getUser(discordReply.access_token)
+			const githubReply = (await app.createToken(req.body)).authentication
+			const githubUser = (
+				await app.checkToken({
+					token: githubReply.token,
+				})
+			).data.user
+			if (!githubUser) throw badRequest()
 			let user: DBAuth
 			// If the user exists, update the tokens and stuff, otherwise, create the user
 			if (
-				await discordAuthDB()
+				await githubAuthDB()
 					.where({
-						discord_id: discordUser.id,
+						github_id: githubUser.id,
 					})
 					.first()
 			) {
-				await discordAuthDB()
+				await githubAuthDB()
 					.where({
-						discord_id: discordUser.id,
+						github_id: githubUser.id,
 					})
 					.update({
-						discord_auth_token: discordReply.access_token,
-						discord_refresh_token: discordReply.refresh_token,
-						discord_redirect_uri: req.body.redirectUrl,
-						discord_token_expire_date: toDatabaseTimestamp(
-							new Date(Date.now() + discordReply.expires_in * 1000)
-						),
+						github_auth_token: githubReply.token,
+						github_redirect_uri: req.body.redirectUrl,
 					})
 
 				const userId = (
-					await discordAuthDB()
+					await githubAuthDB()
 						.where({
-							discord_id: discordUser.id,
+							github_id: githubUser.id,
 						})
 						.first()
 				)?.user_id
@@ -58,19 +64,15 @@ export const discordLogin = new ControllerEndpoint<{
 				const newToken = generateToken()
 				await authDB().insert({
 					token: newToken,
-					username: `${discordUser.username}#${discordUser.discriminator}`,
+					username: githubUser.login,
 				})
 
 				const newUserData = await authDB().where({ token: newToken }).first()
 				if (!newUserData) throw new Error("Sanity check failed!")
-				await discordAuthDB().insert({
-					discord_auth_token: discordReply.access_token,
-					discord_refresh_token: discordReply.refresh_token,
-					discord_redirect_uri: req.body.redirectUrl,
-					discord_token_expire_date: toDatabaseTimestamp(
-						new Date(Date.now() + discordReply.expires_in * 1000)
-					),
-					discord_id: discordUser.id,
+				await githubAuthDB().insert({
+					github_auth_token: githubReply.token,
+					github_redirect_uri: req.body.redirectUrl,
+					github_id: githubUser.id,
 					user_id: newUserData.user_id,
 				})
 				user = newUserData

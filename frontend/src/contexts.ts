@@ -9,7 +9,7 @@ interface LocalStorageData {
 	token: string
 }
 
-export function writeTokens(api: CoolReturnType<typeof CCRepoAPI>): void {
+export function writeTokens(api: CCRepoAPI): void {
 	if (!api.token) localStorage.removeItem("tokens")
 	else
 		localStorage.setItem(

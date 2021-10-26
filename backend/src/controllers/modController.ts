@@ -14,7 +14,6 @@ import {
 	DBAuth,
 } from "../schemas/auth"
 import { getUser, getUserById } from "./authController"
-import { DBDiscordAuth } from "../schemas/discordAuth"
 import { toDatabaseTimestamp } from "../helpers"
 import sa from "superagent"
 import ajv from "ajv"
@@ -82,9 +81,7 @@ export async function bumpMod(
 		const ogAuthor = await getUserById(oldMod.author_id)
 		if (!ogAuthor) throw boom.internal("Mod author doesn't exist!")
 		if (bumper && ogAuthor.user_id !== bumper.user_id)
-			throw boom.unauthorized(
-				"Only the owner can publish new mod versions!"
-			)
+			throw boom.unauthorized("Only the owner can publish new mod versions!")
 		author = ogAuthor
 	}
 
@@ -104,10 +101,7 @@ export async function bumpMod(
 	try {
 		await db.transaction(async ctx => {
 			try {
-				await modDB()
-					.transacting(ctx)
-					.where({ keyname: res.name })
-					.del()
+				await modDB().transacting(ctx).where({ keyname: res.name }).del()
 				await modDB().transacting(ctx).insert(dbMod)
 				await ctx.commit()
 			} catch (err) {

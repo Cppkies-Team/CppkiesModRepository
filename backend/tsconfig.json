@@ -1,14 +1,14 @@
 {
-	"compilerOptions": {
-		"esModuleInterop": true,
-		"resolveJsonModule": true,
-		"moduleResolution": "node",
-		"sourceMap": true,
-		"incremental": true,
-		"strict": true,
-		"outDir": "dist",
-		"target": "ES2019",
-		"module": "CommonJS"
-	},
-	"include": ["src/**/*.ts"]
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "incremental": true,
+    "strict": true,
+    "outDir": "dist",
+    "target": "ES2019",
+    "module": "CommonJS"
+  },
+  "include": ["src/**/*.ts"]
 }

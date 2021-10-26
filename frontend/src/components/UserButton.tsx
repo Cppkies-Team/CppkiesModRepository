@@ -32,7 +32,10 @@ const UserButton: React.FC = () => {
 						<>
 							Logged in as {api.user.username}
 							<br />
-							Binded platforms: TODO
+							Binded platforms:{" "}
+							{api.user.bindedPlatforms
+								.map(val => val[0].toUpperCase() + val.slice(1))
+								.join(", ")}
 							<br />
 							<Button onClick={() => api.logout()} type="bad">
 								Log out

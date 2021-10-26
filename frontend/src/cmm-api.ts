@@ -29,7 +29,7 @@ class CMMApi {
 		}
 	}
 	emit(eventName: ApiEvents): void {
-		this._events[eventName].forEach((val) => val())
+		this._events[eventName].forEach(val => val())
 	}
 	on(eventName: ApiEvents, func: () => void): void {
 		this._events[eventName].push(func)
