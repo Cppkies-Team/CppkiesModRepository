@@ -15,8 +15,9 @@ echo "Building api library..."
 npm run prodBuild
 cd ../frontend
 echo "Building frontend..."
-npm run build:prod
+npm run build
 cd ../backend
 echo "Building backend..."
+npx knex migrate:latest
 npm run build
 cd ..

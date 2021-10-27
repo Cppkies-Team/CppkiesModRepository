@@ -12,7 +12,7 @@ export default class CCRepoAPI {
 		: "http://localhost:9001/api"
 	redirectUrl = prod
 		? `${this.apiLink.substr(0, this.apiLink.length - 3)}login/`
-		: "http://localhost:5500/login/"
+		: "http://localhost:3000/login/"
 	constructor(public token?: string) {
 		if (token) this.getSelfUser()
 	}

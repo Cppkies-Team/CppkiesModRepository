@@ -5,12 +5,9 @@
 	"description": "",
 	"main": "",
 	"scripts": {
-		"build:prod": "echo '{\"prod\":true}' > prod.json && env NODE_ENV=production npm run build",
-		"build:dev": "echo '{\"prod\":false}' > prod.json && env NODE_ENV=development npm run build",
-		"build": "npx webpack",
-		"eslint": "npx eslint ./src/*.jsx ./src/**/*.jsx ./src/**/*.js *.js",
-		"watch": "echo '{\"prod\":false}' > prod.json && env NODE_ENV=development npx webpack-dev-server",
-		"eslint:fix": "npm run eslint -- --fix"
+		"build": "next build",
+		"dev": "next dev",
+		"start": "next start"
 	},
 	"author": "G lander",
 	"license": "ISC",
@@ -18,24 +15,13 @@
 		"@popperjs/core": "^2.6.0",
 		"@types/react": "^16.9.37",
 		"@types/react-dom": "^16.9.8",
-		"@types/react-router-dom": "^5.1.6",
-		"@types/styled-components": "^5.1.7",
-		"@typescript-eslint/eslint-plugin": "^4.11.0",
-		"@typescript-eslint/parser": "^4.11.0",
-		"copy-webpack-plugin": "^6.4.1",
 		"eslint": "^7.16.0",
+		"eslint-config-next": "12.0.1",
 		"eslint-plugin-react": "^7.21.5",
-		"html-webpack-plugin": "^3.2.0",
-		"react": "^16.12.0",
-		"react-dom": "^16.12.0",
+		"next": "^12.0.0",
 		"react-is": "^17.0.2",
 		"react-popper": "^2.2.4",
-		"react-router-dom": "^5.2.0",
-		"styled-components": "^5.2.1",
-		"ts-loader": "^7.0.5",
-		"typescript": "^4.1.3",
-		"webpack": "^4.46.0",
-		"webpack-cli": "^3.3.12",
-		"webpack-dev-server": "^3.11.2"
+		"sass": "^1.43.3",
+		"typescript": "^4.1.3"
 	}
 }

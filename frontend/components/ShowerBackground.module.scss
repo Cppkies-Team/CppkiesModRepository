@@ -1,0 +1,17 @@
+.showerBackground {
+	@keyframes scroll {
+		from {
+			background-position-y: 0px;
+		}
+
+		to {
+			background-position-y: 512px;
+		}
+	}
+	background-image: url(//orteil.dashnet.org/cookieclicker/img/cookieShower3.png);
+	z-index: -999;
+	width: 100%;
+	height: 100%;
+	animation: 5s linear 0s infinite forwards running scroll;
+	position: absolute;
+}

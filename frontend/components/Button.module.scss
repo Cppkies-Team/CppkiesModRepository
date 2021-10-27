@@ -1,0 +1,53 @@
+.button {
+	border: 1px solid;
+	border-color: #ece2b6 #875526 #733726 #dfbc9a;
+	border-radius: 2px;
+	background: black;
+	text-shadow: 0px 1px 1px #000;
+	color: #ccc;
+	line-height: 100%;
+	display: inline-block;
+	margin: 2px 4px 2px 0px;
+	font-size: 12px;
+	padding: 4px 8px;
+	text-decoration: none;
+	font-family: Tahoma;
+	cursor: pointer;
+	user-select: none;
+
+	&:hover {
+		text-shadow: none;
+		border-color: white;
+		color: white;
+	}
+}
+
+.good {
+	color: #096;
+	border-color: #096;
+
+	&:hover {
+		border-color: #3c9;
+		color: #3c9;
+	}
+}
+
+.bad {
+	color: #c00;
+	border-color: #c00;
+
+	&:hover {
+		border-color: #f33;
+		color: #f33;
+	}
+}
+
+.off,
+.disabled {
+	opacity: 0.5;
+}
+
+.disabled {
+	cursor: default;
+	pointer-events: none;
+}
